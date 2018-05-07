@@ -1,0 +1,31 @@
+{
+  "name": "devservice",
+  "version": "1.0.0",
+  "description": "Dev social network",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "server": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LukeWlodarczyk/DevService.git"
+  },
+  "author": "Luke Wlodarczyk",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LukeWlodarczyk/DevService/issues"
+  },
+  "homepage": "https://github.com/LukeWlodarczyk/DevService#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.3",
+    "jsonwebtoken": "^8.2.1",
+    "mongoose": "^5.0.17",
+    "passport": "^0.4.0",
+    "passport-jwt": "^4.0.0",
+    "validator": "^10.1.0"
+  }
+}
