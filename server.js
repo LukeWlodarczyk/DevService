@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const passport = require('passport');
 require('dotenv').config();
 
 const users = require('./routes/api/users');
@@ -10,7 +11,7 @@ const app = express();
 
 // Body parser middleware
 app.use([
-  express.urlencoded({ extended: false}),
+  express.urlencoded({ extended: false }),
   express.json()
 ]);
 
@@ -25,7 +26,11 @@ mongoose
   .then( () => console.log('MongoDB connected'))
   .catch( err => console.log(err));
 
-app.get('/', (req, res) => res.send('hello!'));
+// Passport middleware
+app.use(passport.initialize());
+
+// Pasport Config
+require('./config/passport')(passport);
 
 // Use routes
 app.use('/api/users', users);
