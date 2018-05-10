@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { loginUser } from '../../actions/auth';
+import TextFieldGroup from '../common/TextFieldGroup';
 
 class Login extends Component {
   constructor() {
@@ -55,18 +56,22 @@ class Login extends Component {
               <h1 className="display-4 text-center">Log In</h1>
               <p className="lead text-center">Sign in to your DevService account</p>
               <form noValidate onSubmit={this.onSubmit} >
-                <div className="form-group">
-                  <input onChange={this.onChange} type="email" className={errors.email ? "form-control form-control-lg is-invalid" : "form-control form-control-lg"} placeholder="Email Address" name="email" />
-                  {errors.email && (
-                    <div className='invalid-feedback'>{errors.email}</div>
-                  )}
-                </div>
-                <div className="form-group">
-                  <input onChange={this.onChange} type="password" className={errors.password ? "form-control form-control-lg is-invalid" : "form-control form-control-lg"} placeholder="Password" name="password" />
-                  {errors.password && (
-                    <div className='invalid-feedback'>{errors.password}</div>
-                  )}
-                </div>
+                <TextFieldGroup
+                  placeholder="Email Address"
+                  name="email"
+                  type="email"
+                  value={this.state.email}
+                  onChange={this.onChange}
+                  error={errors.email}
+                />
+                <TextFieldGroup
+                  placeholder="Password"
+                  name="password"
+                  type="password"
+                  value={this.state.password}
+                  onChange={this.onChange}
+                  error={errors.password}
+                />
                 <input onChange={this.onChange} type="submit" className="btn btn-info btn-block mt-4" />
               </form>
             </div>
