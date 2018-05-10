@@ -1,9 +1,19 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { logoutUser } from '../../actions/auth';
 
 class Navbar extends Component {
 
+  onLogoutClick = (e) => {
+    e.preventDefault();
+    this.props.logoutUser();
+  }
+
   render() {
+
+    const { isAuthenticated, user } = this.props.auth;
 
     const authLinks = (
       <ul className="navbar-nav ml-auto">
@@ -21,11 +31,12 @@ class Navbar extends Component {
           <a
             href=""
             className="nav-link"
+            onClick={this.onLogoutClick}
           >
             <img
               className="rounded-circle"
-              src=''
-              alt=''
+              src={user.avatar}
+              alt={user.name}
               style={{ width: '25px', marginRight: '5px' }}
               title="You must have a Gravatar connected to your email to display an image"
             />
@@ -73,7 +84,7 @@ class Navbar extends Component {
                 </Link>
               </li>
             </ul>
-            {false ? authLinks : guestLinks}
+            {isAuthenticated ? authLinks : guestLinks}
           </div>
         </div>
       </nav>
@@ -81,4 +92,13 @@ class Navbar extends Component {
   }
 }
 
-export default Navbar
+Navbar.propTypes = {
+  logoutUser: PropTypes.func.isRequired,
+  auth: PropTypes.object.isRequired
+};
+
+const mapStateToProps = state => ({
+  auth: state.auth
+});
+
+export default connect(mapStateToProps, { logoutUser })(Navbar);
