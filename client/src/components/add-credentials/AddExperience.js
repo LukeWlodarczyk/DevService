@@ -56,7 +56,8 @@ class AddExperience extends Component {
   onCheck = (e) => {
     this.setState({
       disabled: !this.state.disabled,
-      current: !this.state.current
+      current: !this.state.current,
+      to: !this.state.current ? '' : this.state.to,
     });
   }
 
@@ -113,7 +114,7 @@ class AddExperience extends Component {
                   value={this.state.to}
                   onChange={this.onChange}
                   error={errors.to}
-                  disabled={this.state.disabled ? 'disabled' : ''}
+                  disabled={this.state.disabled}
                 />
                 <div className="form-check mb-4">
                   <input
@@ -135,7 +136,7 @@ class AddExperience extends Component {
                   value={this.state.description}
                   onChange={this.onChange}
                   error={errors.description}
-                  info="Tell us about the the position"
+                  info="Tell us about the position"
                 />
                 <input
                   type="submit"
