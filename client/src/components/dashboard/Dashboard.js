@@ -11,7 +11,7 @@ class Dashboard extends Component {
     this.props.getCurrentProfile();
   }
 
-  onDeleteClick(e) {
+  onDeleteClick = (e) => {
     this.props.deleteAccount();
   }
 
@@ -33,7 +33,7 @@ class Dashboard extends Component {
             <ProfileActions />
             <div style={{ marginBottom: '60px' }} />
             <button
-              onClick={this.onDeleteClick.bind(this)}
+              onClick={this.onDeleteClick}
               className="btn btn-danger"
             >
               Delete My Account
@@ -80,6 +80,4 @@ const mapStateToProps = state => ({
   auth: state.auth
 });
 
-export default connect(mapStateToProps, { getCurrentProfile, deleteAccount })(
-  Dashboard
-);
+export default connect(mapStateToProps, { getCurrentProfile, deleteAccount })(Dashboard);

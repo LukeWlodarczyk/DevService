@@ -7,7 +7,6 @@ import TextAreaFieldGroup from '../common/TextAreaFieldGroup';
 import InputGroup from '../common/InputGroup';
 import SelectListGroup from '../common/SelectListGroup';
 import { createProfile, getCurrentProfile, clearErrors } from '../../actions/profile';
-import isEmpty from '../../validation/is-empty';
 
 class EditProfile extends Component {
   constructor(props) {
@@ -48,6 +47,7 @@ class EditProfile extends Component {
       return {
         errors: nextProps.errors,
         ...profile,
+        ...profile.social,
         skills,
       }
     }
@@ -90,7 +90,6 @@ class EditProfile extends Component {
 
   render() {
     const { errors, displaySocialInputs } = this.state;
-
     let socialInputs;
 
     if (displaySocialInputs) {
@@ -272,6 +271,4 @@ const mapStateToProps = state => ({
   errors: state.errors
 });
 
-export default connect(mapStateToProps, { createProfile, getCurrentProfile, clearErrors })(
-  withRouter(EditProfile)
-);
+export default connect(mapStateToProps, { createProfile, getCurrentProfile, clearErrors })(EditProfile);
