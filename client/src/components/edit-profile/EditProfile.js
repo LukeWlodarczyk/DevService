@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import TextFieldGroup from '../common/TextFieldGroup';
 import TextAreaFieldGroup from '../common/TextAreaFieldGroup';
 import InputGroup from '../common/InputGroup';
 import SelectListGroup from '../common/SelectListGroup';
-import { createProfile, clearErrors } from '../../actions/profile';
+import { createProfile, getCurrentProfile, clearErrors } from '../../actions/profile';
+import isEmpty from '../../validation/is-empty';
 
-class CreateProfile extends Component {
+class EditProfile extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -32,15 +33,27 @@ class CreateProfile extends Component {
 
   componentDidMount() {
     if(this.props.profile.profile === null) {
-      this.props.history.push('/dashboard');
+      return this.props.history.push('/dashboard');
     }
     if(Object.keys(this.props.errors).length !== 0) {
       this.props.clearErrors();
     }
+    this.props.getCurrentProfile();
   }
 
   static getDerivedStateFromProps = (nextProps) => {
-     return { errors: nextProps.errors };
+    if(Object.keys(nextProps.errors).length || nextProps.profile.profile) {
+      const profile = nextProps.profile.profile;
+      const skills = profile.skills.join(',');
+      return {
+        errors: nextProps.errors,
+        ...profile,
+        skills,
+      }
+    }
+
+    return null;
+
   };
 
   onSubmit = (e) => {
@@ -131,7 +144,6 @@ class CreateProfile extends Component {
       );
     }
 
-    // Select options for status
     const options = [
       { label: '* Select Professional Status', value: 0 },
       { label: 'Developer', value: 'Developer' },
@@ -149,10 +161,10 @@ class CreateProfile extends Component {
         <div className="container">
           <div className="row">
             <div className="col-md-8 m-auto">
-              <h1 className="display-4 text-center">Create Your Profile</h1>
-              <p className="lead text-center">
-                Let{"'"}s get some information to make your profile stand out
-              </p>
+              <Link to="/dashboard" className="btn btn-light">
+                Go Back
+              </Link>
+              <h1 className="display-4 text-center">Edit Profile</h1>
               <small className="d-block pb-3">* = required fields</small>
               <form onSubmit={this.onSubmit}>
                 <TextFieldGroup
@@ -247,11 +259,12 @@ class CreateProfile extends Component {
   }
 }
 
-CreateProfile.propTypes = {
-  profile: PropTypes.object.isRequired,
-  errors: PropTypes.object.isRequired,
+EditProfile.propTypes = {
   createProfile: PropTypes.func.isRequired,
+  getCurrentProfile: PropTypes.func.isRequired,
   clearErrors: PropTypes.func.isRequired,
+  profile: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -259,6 +272,6 @@ const mapStateToProps = state => ({
   errors: state.errors
 });
 
-export default connect(mapStateToProps, { createProfile, clearErrors })(
-  withRouter(CreateProfile)
+export default connect(mapStateToProps, { createProfile, getCurrentProfile, clearErrors })(
+  withRouter(EditProfile)
 );

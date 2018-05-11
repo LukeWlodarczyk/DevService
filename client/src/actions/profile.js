@@ -4,7 +4,9 @@ import {
   PROFILE_LOADING,
   CLEAR_CURRENT_PROFILE,
   GET_ERRORS,
+  CLEAR_ERRORS,
 } from '../constants/action-types';
+import { logoutUser } from './auth';
 
 export const getCurrentProfile = () => dispatch => {
   dispatch(setProfileLoading());
@@ -36,6 +38,21 @@ export const createProfile = (profileData, history) => dispatch => {
     );
 };
 
+export const deleteAccount = () => dispatch => {
+  if (window.confirm('Are you sure? This operation is permanent!')) {
+    axios
+      .delete('/api/profile')
+      .then(res =>
+        dispatch(logoutUser())
+      )
+      .catch(err =>
+        dispatch({
+          type: GET_ERRORS,
+          payload: err.response.data
+        })
+      );
+  }
+};
 
 export const setProfileLoading = () => {
   return {
@@ -46,5 +63,11 @@ export const setProfileLoading = () => {
 export const clearCurrentProfile = () => {
   return {
     type: CLEAR_CURRENT_PROFILE
+  };
+};
+
+export const clearErrors = () => {
+  return {
+    type: CLEAR_ERRORS
   };
 };

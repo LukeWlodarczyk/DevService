@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { registerUser } from '../../actions/auth';
+import { clearErrors } from '../../actions/profile';
 import TextFieldGroup from '../common/TextFieldGroup';
 
 class Register extends Component {
@@ -20,13 +21,16 @@ class Register extends Component {
     if (this.props.auth.isAuthenticated) {
       this.props.history.push('/dashboard');
     }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if(nextProps.errors) {
-      this.setState({ errors: nextProps.errors });
+    if(Object.keys(this.props.errors).length !== 0) {
+      this.props.clearErrors();
     }
   }
+
+  static getDerivedStateFromProps = (nextProps) => {
+     return { errors: nextProps.errors };
+  };
+
+
 
   onChange = (e) => {
     this.setState({ [e.target.name]: e.target.value });
@@ -99,6 +103,7 @@ class Register extends Component {
 
 Register.propTypes = {
   registerUser: PropTypes.func.isRequired,
+  clearErrors: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired
 };
@@ -108,4 +113,4 @@ const mapStateToProps = state => ({
   errors: state.errors
 });
 
-export default connect(mapStateToProps, { registerUser })(Register);
+export default connect(mapStateToProps, { registerUser, clearErrors })(Register);
