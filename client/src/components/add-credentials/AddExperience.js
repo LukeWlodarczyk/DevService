@@ -23,7 +23,9 @@ class AddExperience extends Component {
   }
 
   componentDidMount() {
-    this.props.clearErrors();
+    if(Object.keys(this.props.errors).length !== 0) {
+      this.props.clearErrors();
+    }
   }
 
   static getDerivedStateFromProps(nextProps) {
@@ -53,7 +55,7 @@ class AddExperience extends Component {
     this.setState({ [e.target.name]: e.target.value });
   }
 
-  onCheck = (e) => {
+  onCheck = () => {
     this.setState({
       disabled: !this.state.disabled,
       current: !this.state.current,
