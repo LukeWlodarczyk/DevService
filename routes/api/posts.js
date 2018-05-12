@@ -86,6 +86,10 @@ router.post('/like/:id', passport.authenticate('jwt', { session: false }), (req,
         return res.status(400).json({ alreadyliked: 'User already liked this post' });
       }
 
+      if( post.dislikes.some(like => like.user.toString() === req.user.id) ) {
+        post.dislikes = post.dislikes.filter(item => item.user.toString() !== req.user.id)
+      }
+
       post.likes.unshift({ user: req.user.id });
 
       post
@@ -99,17 +103,19 @@ router.post('/like/:id', passport.authenticate('jwt', { session: false }), (req,
 // @route   POST api/posts/unlike/:id
 // @desc    Unlike post
 // @access  Private
-router.post('/unlike/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+router.post('/dislike/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
   Post
     .findById(req.params.id)
     .then(post => {
-      if( !post.likes.some(like => like.user.toString() === req.user.id) ) {
-        return res.status(400).json({ notliked: 'You have not yet liked this post' });
+      if( post.dislikes.some(like => like.user.toString() === req.user.id) ) {
+        return res.status(400).json({ disliked: 'User already disliked this post' });
       }
 
-      const removeIndex = post.likes.findIndex(item => item.user.toString() === req.user.id);
+      if( post.likes.some(like => like.user.toString() === req.user.id) ) {
+        post.likes = post.likes.filter(item => item.user.toString() !== req.user.id)
+      }
 
-      post.likes.splice(removeIndex, 1);
+      post.dislikes.unshift({ user: req.user.id });
 
       post
         .save()
