@@ -6,6 +6,7 @@ const passport = require('passport');
 const Post = require('../../models/Post');
 
 const validatePostInput = require('../../validation/post');
+const validateCommentInput = require('../../validation/comment');
 
 // @route   GET api/posts/test
 // @desc    Tests profile route
@@ -46,9 +47,12 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
 
   const newPost = new Post({
     text: req.body.text,
+    title: req.body.title,
     name: req.body.name,
     avatar: req.body.avatar,
     user: req.user.id,
+    likes: [],
+    dislikes: [],
   });
 
   Post
@@ -101,7 +105,7 @@ router.post('/like/:id', passport.authenticate('jwt', { session: false }), (req,
 });
 
 // @route   POST api/posts/unlike/:id
-// @desc    Unlike post
+// @desc    Dislike post
 // @access  Private
 router.post('/dislike/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
   Post
@@ -130,7 +134,7 @@ router.post('/dislike/:id', passport.authenticate('jwt', { session: false }), (r
 // @desc    Add comment to post
 // @access  Private
 router.post('/comment/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
-    const { errors, isValid } = validatePostInput(req.body);
+    const { errors, isValid } = validateCommentInput(req.body);
 
     if(!isValid) {
       return res.status(400).json(errors);
