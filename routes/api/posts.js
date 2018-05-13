@@ -87,7 +87,11 @@ router.post('/like/:id', passport.authenticate('jwt', { session: false }), (req,
     .findById(req.params.id)
     .then(post => {
       if( post.likes.some(like => like.user.toString() === req.user.id) ) {
-        return res.status(400).json({ alreadyliked: 'User already liked this post' });
+        post.likes = post.likes.filter(item => item.user.toString() !== req.user.id);
+        return post
+                .save()
+                .then(post => res.json(post))
+                .catch(err => res.json(err));
       }
 
       if( post.dislikes.some(like => like.user.toString() === req.user.id) ) {
@@ -112,7 +116,11 @@ router.post('/dislike/:id', passport.authenticate('jwt', { session: false }), (r
     .findById(req.params.id)
     .then(post => {
       if( post.dislikes.some(like => like.user.toString() === req.user.id) ) {
-        return res.status(400).json({ disliked: 'User already disliked this post' });
+        post.dislikes = post.dislikes.filter(item => item.user.toString() !== req.user.id);
+        return post
+                .save()
+                .then(post => res.json(post))
+                .catch(err => res.json(err));
       }
 
       if( post.likes.some(like => like.user.toString() === req.user.id) ) {
