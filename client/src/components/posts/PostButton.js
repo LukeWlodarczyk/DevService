@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 
 class PostButton extends Component {
 
-  onLikeClick = () => {
-    this.props.onClick(this.props.id);
+  onClickButton = () => {
+    this.props.onClick(this.props.postId);
   }
 
   render() {
@@ -11,7 +11,7 @@ class PostButton extends Component {
 
     return (
       <button
-        onClick={this.onLikeClick}
+        onClick={this.onClickButton}
         type="button"
         className={styles}
       >

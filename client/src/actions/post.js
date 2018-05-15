@@ -6,20 +6,23 @@ import {
   CLEAR_ERRORS,
   GET_POSTS,
   GET_POST,
+  ADD_DISLIKE,
+  ADD_LIKE,
   POST_LOADING,
   DELETE_POST
 } from '../constants/action-types'
 
 
-export const addPost = postData => dispatch => {
+export const addPost = (postData, history) => dispatch => {
   axios
     .post('/api/posts', postData)
-    .then(res =>
+    .then(res => {
       dispatch({
         type: ADD_POST,
         payload: res.data
       })
-    )
+      history.push(`/post/${res.data._id}`)
+    })
     .catch(err =>
       dispatch({
         type: GET_ERRORS,
@@ -81,10 +84,15 @@ export const deletePost = id => dispatch => {
     );
 };
 
-export const addLike = id => dispatch => {
+export const addLike = (postId, userId) => dispatch => {
   axios
-    .post(`/api/posts/like/${id}`)
-    .then(res => {success: true})
+    .post(`/api/posts/like/${postId}`)
+    .then(res =>
+      dispatch({
+        type: ADD_LIKE,
+        payload: userId
+      })
+    )
     .catch(err =>
       dispatch({
         type: GET_ERRORS,
@@ -93,10 +101,15 @@ export const addLike = id => dispatch => {
     );
 };
 
-export const disLike = id => dispatch => {
+export const disLike = (postId, userId) => dispatch => {
   axios
-    .post(`/api/posts/dislike/${id}`)
-    .then(res => {success: true})
+    .post(`/api/posts/dislike/${postId}`)
+    .then(res =>
+      dispatch({
+        type: ADD_DISLIKE,
+        payload: userId
+      })
+    )
     .catch(err =>
       dispatch({
         type: GET_ERRORS,

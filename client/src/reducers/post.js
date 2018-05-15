@@ -2,6 +2,8 @@ import {
   ADD_POST,
   GET_POSTS,
   GET_POST,
+  ADD_LIKE,
+  ADD_DISLIKE,
   DELETE_POST,
   POST_LOADING
 } from '../constants/action-types';
@@ -30,6 +32,34 @@ export default (state = initialState, action) => {
         ...state,
         post: action.payload,
         loading: false
+      };
+    case ADD_LIKE:
+    console.log(action.payload);
+      return {
+        ...state,
+        post: {
+          ...state.post,
+          likes: state.post.likes.some( like => like.user === action.payload)
+                  ? state.post.likes.filter( like => like.user !== action.payload)
+                  : [{ user: action.payload }, ...state.post.likes],
+          dislikes: state.post.dislikes.some( dislike => dislike.user === action.payload)
+                    ? state.post.dislikes.filter( dislike => dislike.user !== action.payload)
+                    : state.post.dislikes,
+        },
+      };
+    case ADD_DISLIKE:
+    console.log(action.payload);
+      return {
+        ...state,
+        post: {
+          ...state.post,
+          likes: state.post.likes.some( like => like.user === action.payload)
+                    ? state.post.likes.filter( like => like.user !== action.payload)
+                    : state.post.likes,
+          dislikes: state.post.dislikes.some( dislike => dislike.user === action.payload)
+                    ? state.post.dislikes.filter( dislike => dislike.user !== action.payload)
+                    : [{ user: action.payload }, ...state.post.dislikes],
+        },
       };
     case ADD_POST:
       return {

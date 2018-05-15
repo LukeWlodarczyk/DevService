@@ -37,7 +37,7 @@ class PostForm extends Component {
       avatar: user.avatar
     };
 
-    this.props.addPost(newPost);
+    this.props.addPost(newPost, this.props.history);
     if(this.state.text.length > 20 && this.state.title.length > 10){
       this.setState({ title: '', text: '', errors: {} })
     }

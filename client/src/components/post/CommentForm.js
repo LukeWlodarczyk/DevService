@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import TextAreaFieldGroup from '../common/TextAreaFieldGroup';
 import { addComment } from '../../actions/post';
+import { clearErrors } from '../../actions/profile';
 
 class CommentForm extends Component {
   constructor(props) {
@@ -11,6 +12,12 @@ class CommentForm extends Component {
       text: '',
       errors: {}
     };
+  }
+
+  componentDidMount() {
+    if(Object.keys(this.props.errors).length !== 0) {
+      this.props.clearErrors();
+    }
   }
 
   static getDerivedStateFromProps(newProps) {
@@ -71,7 +78,8 @@ class CommentForm extends Component {
 }
 
 CommentForm.propTypes = {
-  addPost: PropTypes.func.isRequired,
+  addComment: PropTypes.func.isRequired,
+  clearErrors: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired,
   postId: PropTypes.string.isRequired,
   errors: PropTypes.object.isRequired
@@ -82,4 +90,4 @@ const mapStateToProps = state => ({
   errors: state.errors
 });
 
-export default connect(mapStateToProps, { addComment })(CommentForm);
+export default connect(mapStateToProps, { addComment, clearErrors })(CommentForm);
