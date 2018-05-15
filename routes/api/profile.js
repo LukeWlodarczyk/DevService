@@ -128,16 +128,16 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
       if(profile) {
         Profile
           .findOne({ handle: profileFields.handle })
-          .then(exists => {
-            if(exists) {
-            errors.handle = "That handle already exists";
-            return res.status(400).json(errors);
-          }
-          profile
-            .update({ $set: profileFields }, { new: true })
-            .then(profile => res.json(profile))
-            .catch(err => res.json(err));
-
+          .populate('user', ['id'])
+          .then(profile => {
+            if(profile && profile.user.id !== req.user.id) {
+              errors.handle = "That handle already exists";
+              return res.status(400).json(errors);
+            }
+            profile
+              .update({ $set: profileFields }, { new: true })
+              .then(profile => res.json(profile))
+              .catch(err => res.json(err));
           });
       } else {
         Profile
