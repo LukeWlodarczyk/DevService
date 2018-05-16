@@ -4,6 +4,8 @@ import {
   GET_POST,
   ADD_LIKE,
   ADD_DISLIKE,
+  ADD_COMMENT,
+  DELETE_COMMENT,
   DELETE_POST,
   POST_LOADING
 } from '../constants/action-types';
@@ -34,7 +36,6 @@ export default (state = initialState, action) => {
         loading: false
       };
     case ADD_LIKE:
-    console.log(action.payload);
       return {
         ...state,
         post: {
@@ -48,7 +49,6 @@ export default (state = initialState, action) => {
         },
       };
     case ADD_DISLIKE:
-    console.log(action.payload);
       return {
         ...state,
         post: {
@@ -60,6 +60,22 @@ export default (state = initialState, action) => {
                     ? state.post.dislikes.filter( dislike => dislike.user !== action.payload)
                     : [{ user: action.payload }, ...state.post.dislikes],
         },
+      };
+    case ADD_COMMENT:
+      return {
+        ...state,
+        post: {
+          ...state.post,
+          comments: [action.payload, ...state.post.comments]
+        }
+      };
+    case DELETE_COMMENT:
+      return {
+        ...state,
+        post: {
+          ...state.post,
+          comments: state.post.comments.filter( comment => comment._id !== action.payload)
+        }
       };
     case ADD_POST:
       return {

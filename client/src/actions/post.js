@@ -8,6 +8,8 @@ import {
   GET_POST,
   ADD_DISLIKE,
   ADD_LIKE,
+  ADD_COMMENT,
+  DELETE_COMMENT,
   POST_LOADING,
   DELETE_POST
 } from '../constants/action-types'
@@ -124,7 +126,7 @@ export const addComment = (postId, commentData) => dispatch => {
     .post(`/api/posts/comment/${postId}`, commentData)
     .then(res =>
       dispatch({
-        type: GET_POST,
+        type: ADD_COMMENT,
         payload: res.data
       })
     )
@@ -141,8 +143,8 @@ export const deleteComment = (postId, commentId) => dispatch => {
     .delete(`/api/posts/comment/${postId}/${commentId}`)
     .then(res =>
       dispatch({
-        type: GET_POST,
-        payload: res.data
+        type: DELETE_COMMENT,
+        payload: commentId
       })
     )
     .catch(err =>

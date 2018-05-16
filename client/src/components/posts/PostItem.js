@@ -17,7 +17,6 @@ class PostItem extends Component {
   }
 
   static getDerivedStateFromProps(nextProps) {
-    console.log('derived');
      return {
        likesCount: nextProps.post.likes.length,
        dislikesCount: nextProps.post.dislikes.length,
@@ -39,17 +38,8 @@ class PostItem extends Component {
     this.props.disLike(postId, this.props.auth.user.id);
   }
 
-  findUserLikeDislike = () => {
-    const { auth } = this.props;
-    this.setState({
-      liked: this.state.likes.some(like => like.user === auth.user.id),
-      disliked: this.state.dislikes.some(dislike => dislike.user === auth.user.id),
-    })
-  }
-
   render() {
     const { post, auth, showActions } = this.props;
-    const { liked, disliked } = this.state;
 
     return (
       <div className="card card-body mb-3">
@@ -68,9 +58,16 @@ class PostItem extends Component {
           <div className="col-md-10">
             <h3>{post.title}</h3>
             <p className="lead">{post.text}</p>
+              {!showActions && (
+                <div className="mr-auto">
+                  <span className="badge badge-success">{post.likes.length}</span>
+                  <span>-</span>
+                  <span className="badge badge-danger">{post.dislikes.length}</span>
+                </div>
+              )}
               { !showActions && (
-                <Link to={`/post/${post._id}`} className="btn btn-info mr-1">
-                  Comments
+                <Link to={`/post/${post._id}`} className="btn btn-info ml-auto">
+                  {post.comments.length} comments
                 </Link>)
               }
             {
@@ -79,14 +76,20 @@ class PostItem extends Component {
                   <PostButton
                     onClick={this.onLikeClick}
                     postId={post._id}
-                    icon={this.state.likes.some(like => like.user === auth.user.id) ? 'fas fa-thumbs-up text-success' : 'fas fa-thumbs-up'}
+                    icon={this.state.likes.some(like => like.user === auth.user.id)
+                      ? 'fas fa-thumbs-up text-success'
+                      : 'fas fa-thumbs-up'
+                    }
                     styles='btn btn-light mr-1'
                     count={this.state.likesCount}
                   />
                   <PostButton
                     onClick={this.onDisLikeClick}
                     postId={post._id}
-                    icon={this.state.dislikes.some(dislike => dislike.user === auth.user.id) ? 'fas fa-thumbs-down text-danger' : 'fas fa-thumbs-down'}
+                    icon={this.state.dislikes.some(dislike => dislike.user === auth.user.id)
+                      ? 'fas fa-thumbs-down text-danger'
+                      : 'fas fa-thumbs-down'
+                    }
                     styles='btn btn-light mr-1'
                     count={this.state.dislikesCount}
                   />
