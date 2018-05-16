@@ -6,6 +6,7 @@ import {
   ADD_DISLIKE,
   ADD_COMMENT,
   DELETE_COMMENT,
+  SET_BEST_COMMENT,
   DELETE_POST,
   POST_LOADING
 } from '../constants/action-types';
@@ -77,6 +78,21 @@ export default (state = initialState, action) => {
           comments: state.post.comments.filter( comment => comment._id !== action.payload)
         }
       };
+    case SET_BEST_COMMENT:
+      return {
+        ...state,
+        post: {
+          ...state.post,
+          comments: state.post.comments.map( comment => {
+            if(comment._id === action.payload) {
+              comment.best = comment.best ? false : true;
+              return comment;
+            }
+            comment.best = false;
+            return comment;
+          })
+        }
+      }
     case ADD_POST:
       return {
         ...state,

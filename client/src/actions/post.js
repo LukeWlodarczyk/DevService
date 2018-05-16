@@ -10,6 +10,7 @@ import {
   ADD_LIKE,
   ADD_COMMENT,
   DELETE_COMMENT,
+  SET_BEST_COMMENT,
   POST_LOADING,
   DELETE_POST
 } from '../constants/action-types'
@@ -154,6 +155,23 @@ export const deleteComment = (postId, commentId) => dispatch => {
       })
     );
 };
+
+export const setBestComment = (postId, commentId) => dispatch => {
+  axios
+    .post(`/api/posts/comment/best/${postId}/${commentId}`)
+    .then(res =>
+      dispatch({
+        type: SET_BEST_COMMENT,
+        payload: commentId
+      })
+    )
+    .catch(err =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data
+      })
+    );
+}
 
 export const setPostLoading = () => {
   return {

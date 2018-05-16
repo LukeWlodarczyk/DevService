@@ -39,7 +39,7 @@ class PostItem extends Component {
   }
 
   render() {
-    const { post, auth, showActions } = this.props;
+    const { post, auth, showActions, truncate } = this.props;
 
     return (
       <div className="card card-body mb-3">
@@ -57,16 +57,17 @@ class PostItem extends Component {
           </div>
           <div className="col-md-10">
             <h3>{post.title}</h3>
-            <p className="lead">{post.text}</p>
+            <div className="small">{new Date(post.date).toLocaleDateString()}</div>
+            <p className={truncate ? "lead text-truncate" : "lead"}>{post.text}</p>
               {!showActions && (
-                <div className="mr-auto">
-                  <span className="badge badge-success">{post.likes.length}</span>
+                <div className="mb-1">
+                  <span className="badge badge-success">{this.state.likesCount}</span>
                   <span>-</span>
-                  <span className="badge badge-danger">{post.dislikes.length}</span>
+                  <span className="badge badge-danger">{this.state.dislikesCount}</span>
                 </div>
               )}
               { !showActions && (
-                <Link to={`/post/${post._id}`} className="btn btn-info ml-auto">
+                <Link to={`/post/${post._id}`} className="btn btn-info mr-2">
                   {post.comments.length} comments
                 </Link>)
               }
@@ -115,7 +116,8 @@ class PostItem extends Component {
 }
 
 PostItem.defaultProps = {
-  showActions: true
+  showActions: true,
+  truncate: true,
 };
 
 PostItem.propTypes = {

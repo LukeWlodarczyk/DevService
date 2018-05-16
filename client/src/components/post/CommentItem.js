@@ -1,18 +1,32 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { deleteComment } from '../../actions/post';
+import { deleteComment, setBestComment } from '../../actions/post';
 
 class CommentItem extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      best: this.props.comment.best,
+    }
+  }
+
   onDeleteClick = () => {
     this.props.deleteComment(this.props.postId, this.props.comment._id);
   }
 
+  onSetBestCommentClick = () => {
+    this.props.setBestComment(this.props.postId, this.props.comment._id);
+    this.setState({
+      best: !this.state.best,
+    })
+  }
+
   render() {
-    const { comment, auth } = this.props;
+    const { comment, auth, postAuthor } = this.props;
 
     return (
-      <div className="card card-body mb-3">
+      <div className={this.state.best ? "card card-body mb-3 border-success" : "card card-body mb-3"}>
         <div className="row">
           <div className="col-md-2">
             <a href="profile.html">
@@ -26,16 +40,29 @@ class CommentItem extends Component {
             <p className="text-center">{comment.name}</p>
           </div>
           <div className="col-md-10">
+            <div className="text-center small">{new Date(comment.date).toLocaleDateString()}</div>
             <p className="lead">{comment.text}</p>
-            {comment.user === auth.user.id ? (
-              <button
-                onClick={this.onDeleteClick}
-                type="button"
-                className="btn btn-danger mr-1"
-              >
-                <i className="fas fa-times" />
-              </button>
-            ) : null}
+            <div className="text-center text-md-left">
+              {comment.user === auth.user.id ? (
+                <button
+                  onClick={this.onDeleteClick}
+                  type="button"
+                  className="btn btn-danger mr-1"
+                >
+                  <i className="fas fa-times" />
+                </button>
+              ) : null}
+              {postAuthor === auth.user.id ? (
+                <button
+                  onClick={this.onSetBestCommentClick}
+                  type="button"
+                  className="btn btn-success mr-1"
+                >
+                  <i className="fas fa-trophy" />
+                </button>
+              ) : null}
+            </div>
+
           </div>
         </div>
       </div>
@@ -45,6 +72,7 @@ class CommentItem extends Component {
 
 CommentItem.propTypes = {
   deleteComment: PropTypes.func.isRequired,
+  setBestComment: PropTypes.func.isRequired,
   comment: PropTypes.object.isRequired,
   postId: PropTypes.string.isRequired,
   auth: PropTypes.object.isRequired
@@ -54,4 +82,4 @@ const mapStateToProps = state => ({
   auth: state.auth
 });
 
-export default connect(mapStateToProps, { deleteComment })(CommentItem);
+export default connect(mapStateToProps, { deleteComment, setBestComment })(CommentItem);

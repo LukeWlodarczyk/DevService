@@ -197,5 +197,38 @@ router.delete('/comment/:id/:comment_id', passport.authenticate('jwt', { session
   }
 );
 
+// @route   POST api/posts/comment/best/:id:comment_id
+// @desc    Sign as the best comment
+// @access  Private
+router.post('/comment/best/:id/:comment_id', passport.authenticate('jwt', { session: false }), (req, res) => {
+
+  Post
+    .findById(req.params.id)
+    .then(post => {
+      if( !post.comments.some(comment => comment._id.toString() === req.params.comment_id )) {
+        return res.status(404).json({ commentnotexists: 'Comment does not exist' });
+      };
+
+      if(req.user.id !== post.user.toString()) {
+         return res.status(401).json({ notauthorized: "User not authorized" });
+      };
+
+      const comment = post.comments.find(comment => comment._id.toString() === req.params.comment_id);
+
+      if(comment.best === true) {
+        comment.best = false;
+      } else {
+        comment.best = true;
+      }
+
+      post
+        .save()
+        .then(post => res.json(post))
+        .catch(err => res.json(err));
+    })
+    .catch(err => res.status(404).json({ postnotfound: 'No post found' }));
+  }
+);
+
 
 module.exports = router;
