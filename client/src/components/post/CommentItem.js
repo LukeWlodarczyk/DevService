@@ -15,10 +15,9 @@ class CommentItem extends Component {
 
   render() {
     const { comment, auth, postAuthor } = this.props;
-    console.log('aaaaaaaaaa');
 
     return (
-      <div className={comment.best ? "card card-body mb-3 border-success" : "card card-body mb-3"}>
+      <div className={comment.best ? "card card-body mb-3 border-success mb-5" : "card card-body mb-3"}>
         <div className="row">
           <div className="col-md-2">
             <a href="profile.html">
