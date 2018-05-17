@@ -53,7 +53,6 @@ export const getPosts = () => dispatch => {
 };
 
 export const getPost = id => dispatch => {
-  dispatch(setPostLoading());
   axios
     .get(`/api/posts/${id}`)
     .then(res =>
@@ -159,12 +158,16 @@ export const deleteComment = (postId, commentId) => dispatch => {
 export const setBestComment = (postId, commentId) => dispatch => {
   axios
     .post(`/api/posts/comment/best/${postId}/${commentId}`)
-    .then(res =>
+    .then(res => {
       dispatch({
         type: SET_BEST_COMMENT,
         payload: commentId
       })
-    )
+      dispatch({
+        type: GET_POST,
+        payload: res.data
+      })
+    })
     .catch(err =>
       dispatch({
         type: GET_ERRORS,

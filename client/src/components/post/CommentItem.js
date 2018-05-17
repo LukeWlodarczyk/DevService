@@ -4,12 +4,6 @@ import PropTypes from 'prop-types';
 import { deleteComment, setBestComment } from '../../actions/post';
 
 class CommentItem extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      best: this.props.comment.best,
-    }
-  }
 
   onDeleteClick = () => {
     this.props.deleteComment(this.props.postId, this.props.comment._id);
@@ -17,16 +11,14 @@ class CommentItem extends Component {
 
   onSetBestCommentClick = () => {
     this.props.setBestComment(this.props.postId, this.props.comment._id);
-    this.setState({
-      best: !this.state.best,
-    })
   }
 
   render() {
     const { comment, auth, postAuthor } = this.props;
+    console.log('aaaaaaaaaa');
 
     return (
-      <div className={this.state.best ? "card card-body mb-3 border-success" : "card card-body mb-3"}>
+      <div className={comment.best ? "card card-body mb-3 border-success" : "card card-body mb-3"}>
         <div className="row">
           <div className="col-md-2">
             <a href="profile.html">
@@ -40,7 +32,7 @@ class CommentItem extends Component {
             <p className="text-center">{comment.name}</p>
           </div>
           <div className="col-md-10">
-            <div className="text-center small">{new Date(comment.date).toLocaleDateString()}</div>
+            <div className="text-right small">{new Date(comment.date).toLocaleDateString()}</div>
             <p className="lead">{comment.text}</p>
             <div className="text-center text-md-left">
               {comment.user === auth.user.id ? (

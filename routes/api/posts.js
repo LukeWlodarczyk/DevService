@@ -213,13 +213,13 @@ router.post('/comment/best/:id/:comment_id', passport.authenticate('jwt', { sess
          return res.status(401).json({ notauthorized: "User not authorized" });
       };
 
-      const comment = post.comments.find(comment => comment._id.toString() === req.params.comment_id);
-
-      if(comment.best === true) {
-        comment.best = false;
-      } else {
-        comment.best = true;
-      }
+      post.comments.forEach( comment => {
+        if(comment._id.toString() === req.params.comment_id) {
+          comment.best = comment.best ? false : true;
+        } else {
+          comment.best = false
+        }
+      })
 
       post
         .save()
