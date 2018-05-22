@@ -42,12 +42,12 @@ class PostItem extends Component {
     const { post, auth, showActions, truncate } = this.props;
 
     return (
-      <div className="card card-body mb-3">
+      <div className="card card-body sm-3 mb-3">
         <div className="row">
-          <div className="col-md-2">
+          <div className="col-sm-2">
             <Link to={'/profile/'+post.user.username} className="btn btn-info">
               <img
-                className="rounded-circle d-none d-md-block"
+                className="rounded-circle d-none d-sm-block"
                 src={post.avatar}
                 alt=""
               />
@@ -55,9 +55,9 @@ class PostItem extends Component {
               <p className="text-center">{post.name}</p>
             </Link>
           </div>
-          <div className="col-md-10">
+          <div className="col-sm-10">
             <h3>{post.title}</h3>
-            <div className="small">{new Date(post.date).toLocaleDateString()}</div>
+            <div className="small text-right">{new Date(post.date).toLocaleDateString()}</div>
             <p className={truncate ? "lead text-truncate" : "lead"}>{post.text}</p>
               {!showActions && (
                 <div className="mb-1">

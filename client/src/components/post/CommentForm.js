@@ -50,7 +50,7 @@ class CommentForm extends Component {
     const { errors } = this.state;
 
     return (
-      <div className="post-form mb-3">
+      <div className="post-form sm-3 my-3">
         <div className="card card-info">
           <div className="card-header bg-info text-white">
             Make a comment...

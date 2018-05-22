@@ -18,22 +18,22 @@ class CommentItem extends Component {
     const { comment, auth, postAuthor } = this.props;
 
     return (
-      <div className={comment.best ? "card card-body mb-3 border-success mb-5" : "card card-body mb-3"}>
+      <div className={comment.best ? "card card-body sm-3 border-success mb-5" : "card card-body sm-3 mb-3"}>
         <div className="row">
-          <div className="col-md-2">
+          <div className="col-sm-2">
             <Link to={'/profile/'+postAuthor.username} className="btn btn-info">
               <img
-                className="rounded-circle d-none d-md-block"
+                className="rounded-circle d-none d-sm-block"
                 src={comment.avatar}
               />
               <br />
               <p className="text-center">{comment.name}</p>
             </Link>
           </div>
-          <div className="col-md-10">
-            <div className="text-right small">{new Date(comment.date).toLocaleDateString()}</div>
+          <div className="col-sm-10">
+            <div className="text-left text-sm-right small">{new Date(comment.date).toLocaleDateString()}</div>
             <p className="lead">{comment.text}</p>
-            <div className="text-center text-md-left">
+            <div className="text-center text-sm-left">
               {comment.user === auth.user.id ? (
                 <button
                   onClick={this.onDeleteClick}
