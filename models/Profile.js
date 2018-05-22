@@ -6,10 +6,8 @@ const ProfileSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'users',
   },
-  handle: {
+  username: {
     type: String,
-    required: true,
-    max: 40,
   },
   company: {
     type: String,
@@ -22,11 +20,9 @@ const ProfileSchema = new Schema({
   },
   status: {
     type: String,
-    required: true,
   },
   skills: {
     type: [String],
-    required: true,
   },
   bio: {
     type: String,

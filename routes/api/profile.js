@@ -51,14 +51,14 @@ router.get('/all', (req, res) => {
     .catch(err => res.status(404).json({ profile: 'There are no profiles' }));
 });
 
-// @route   GET api/profile/handle/:handle
-// @desc    Get profile by handle
+// @route   GET api/profile/:username
+// @desc    Get profile by username
 // @access  Public
-router.get('/handle/:handle', (req, res) => {
+router.get('/:username', (req, res) => {
   const errors = {};
   Profile
-    .findOne({ handle: req.params.handle })
-    .populate('user', ['name', 'avatar'])
+    .findOne({ username: req.params.username })
+    .populate('user', ['name', 'avatar', 'username'])
     .then(profile => {
       if(!profile) {
         errors.noprofile = 'There is no profile for this user';
@@ -88,7 +88,7 @@ router.get('/user/:user_id', (req, res) => {
 });
 
 // @route   POST api/profile
-// @desc    Create ore edit user profile
+// @desc    Edit user profile
 // @access  Private
 router.post('/', passport.authenticate('jwt', { session: false }), (req, res) => {
 
@@ -100,7 +100,6 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
 
   const profileFields = {};
   profileFields.user = req.user.id;
-  if (req.body.handle) profileFields.handle = req.body.handle;
   if (req.body.company) profileFields.company = req.body.company;
   if (req.body.website) profileFields.website = req.body.website;
   if (req.body.location) profileFields.location = req.body.location;
@@ -122,41 +121,17 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
   if (req.body.instagram) profileFields.social.instagram = req.body.instagram;
 
 
-  Profile
-    .findOne({ user: req.user.id })
-    .then(profile => {
-      if(profile) {
-        Profile
-          .findOne({ handle: profileFields.handle })
-          .populate('user', ['id'])
-          .then(profile => {
-            if(profile && profile.user.id !== req.user.id) {
-              errors.handle = "That handle already exists";
-              return res.status(400).json(errors);
-            }
-            profile
-              .update({ $set: profileFields }, { new: true })
-              .then(profile => res.json(profile))
-              .catch(err => res.json(err));
-          });
-      } else {
-        Profile
-          .findOne( { handle: profileFields.handle })
-          .then(profile => {
-            if(profile) {
-              errors.handle = 'That handle already exist';
-              return res.status(400).json(errors);
-            }
 
-            Profile
-              .create(profileFields)
-              .then(profile => res.json(profile))
-              .catch(err => res.json(err));
-          })
-          .catch(err => res.status(404).json(err));
-      }
+  Profile
+    .findOne({ username: req.user.username })
+    .then(profile => {
+      profile
+        .update({ $set: profileFields }, { new: true })
+        .then(profile => res.json(profile))
+        .catch(err => res.json(err));
     })
-    .catch(err => res.status(404).json(err));
+    .catch( err => res.json(err));
+
 });
 
 // @route   POST api/profile/experience

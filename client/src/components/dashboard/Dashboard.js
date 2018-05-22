@@ -26,11 +26,11 @@ class Dashboard extends Component {
     if (profile === null || loading) {
       dashboardContent = <Spinner />;
     } else {
-      if (Object.keys(profile).length > 0) {
+      if (profile.skills.length > 0) {
         dashboardContent = (
           <div>
             <p className="lead text-muted">
-              Welcome <Link to={`/profile/${profile.handle}`}>{user.name}</Link>
+              Welcome <Link to={`/profile/${profile.username}`}>{user.name}</Link>
             </p>
             <ProfileActions />
             <Experience experience={profile.experience} />
@@ -48,9 +48,9 @@ class Dashboard extends Component {
         dashboardContent = (
           <div>
             <p className="lead text-muted">Welcome {user.name}</p>
-            <p>You have not yet setup a profile, please add some info</p>
-            <Link to="/create-profile" className="btn btn-lg btn-info">
-              Create Profile
+            <p>Your profile is almost empty, please add some info.</p>
+            <Link to="/edit-profile" className="btn btn-lg btn-info">
+              Add more details to your profile page
             </Link>
           </div>
         );

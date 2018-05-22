@@ -10,6 +10,7 @@ const validateRegisterInput = require('../../validation/register');
 const validateLoginInput = require('../../validation/login');
 
 const User = require('../../models/User');
+const Profile = require('../../models/Profile');
 
 
 // @route   GET api/users/test
@@ -52,14 +53,24 @@ router.post('/register', (req, res) => {
           avatar,
         });
 
+        const newUserProfile = new Profile({});
+
         bcrypt.genSalt(10, (err, salt) => {
           bcrypt.hash(newUser.password, salt, (err, hash) => {
             if (err) throw err;
             newUser.password = hash;
             newUser
               .save()
-              .then(user => res.json(user))
-              .catch(err => console.log(err));
+              .then(user => {
+                newUserProfile.user = user.id;
+                newUserProfile.username = req.body.username;
+                newUserProfile
+                  .save()
+                  .catch(err => res.json(err));
+
+                res.json(user);
+              })
+              .catch(err => res.json(err));
           });
         });
       };
@@ -87,7 +98,7 @@ router.post('/login', (req, res) => {
     .then(user => {
       if (!user) {
         errors.email_or_username = 'User not found';
-        return res.status(404).send(errors)
+        return res.status(404).json(errors);
       };
       bcrypt.compare(password, user.password)
         .then(isMatch => {
@@ -96,6 +107,7 @@ router.post('/login', (req, res) => {
             const payload = {
               id: user.id,
               name: user.name,
+              username: user.username,
               avatar: user.avatar,
             }
 

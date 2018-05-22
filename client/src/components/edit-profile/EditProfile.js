@@ -6,14 +6,13 @@ import TextFieldGroup from '../common/TextFieldGroup';
 import TextAreaFieldGroup from '../common/TextAreaFieldGroup';
 import InputGroup from '../common/InputGroup';
 import SelectListGroup from '../common/SelectListGroup';
-import { createProfile, getCurrentProfile, clearErrors } from '../../actions/profile';
+import { editProfile, getCurrentProfile, clearErrors } from '../../actions/profile';
 
 class EditProfile extends Component {
   constructor(props) {
     super(props);
     this.state = {
       displaySocialInputs: false,
-      handle: '',
       company: '',
       website: '',
       location: '',
@@ -60,7 +59,6 @@ class EditProfile extends Component {
     e.preventDefault();
 
     const profileData = {
-      handle: this.state.handle,
       company: this.state.company,
       website: this.state.website,
       location: this.state.location,
@@ -75,7 +73,7 @@ class EditProfile extends Component {
       instagram: this.state.instagram
     };
 
-    this.props.createProfile(profileData, this.props.history);
+    this.props.editProfile(profileData, this.props.history);
   }
 
   onChange = (e) => {
@@ -156,7 +154,7 @@ class EditProfile extends Component {
     ];
 
     return (
-      <div className="create-profile">
+      <div className="edit-profile">
         <div className="container">
           <div className="row">
             <div className="col-md-8 m-auto">
@@ -166,16 +164,8 @@ class EditProfile extends Component {
               <h1 className="display-4 text-center">Edit Profile</h1>
               <small className="d-block pb-3">* = required fields</small>
               <form onSubmit={this.onSubmit}>
-                <TextFieldGroup
-                  placeholder="* Profile Handle"
-                  name="handle"
-                  value={this.state.handle}
-                  onChange={this.onChange}
-                  error={errors.handle}
-                  info="A unique handle for your profile URL. Your full name, company name, nickname"
-                />
                 <SelectListGroup
-                  placeholder="Status"
+                  placeholder="* Status"
                   name="status"
                   value={this.state.status}
                   onChange={this.onChange}
@@ -259,7 +249,7 @@ class EditProfile extends Component {
 }
 
 EditProfile.propTypes = {
-  createProfile: PropTypes.func.isRequired,
+  editProfile: PropTypes.func.isRequired,
   getCurrentProfile: PropTypes.func.isRequired,
   clearErrors: PropTypes.func.isRequired,
   profile: PropTypes.object.isRequired,
@@ -271,4 +261,4 @@ const mapStateToProps = state => ({
   errors: state.errors
 });
 
-export default connect(mapStateToProps, { createProfile, getCurrentProfile, clearErrors })(EditProfile);
+export default connect(mapStateToProps, { editProfile, getCurrentProfile, clearErrors })(EditProfile);

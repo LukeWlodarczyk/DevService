@@ -27,10 +27,10 @@ export const getCurrentProfile = () => dispatch => {
     );
 };
 
-export const getProfileByHandle = handle => dispatch => {
+export const getProfileByUsername = username => dispatch => {
   dispatch(setProfileLoading());
   axios
-    .get(`/api/profile/handle/${handle}`)
+    .get(`/api/profile/${username}`)
     .then(res =>
       dispatch({
         type: GET_PROFILE,
@@ -45,7 +45,7 @@ export const getProfileByHandle = handle => dispatch => {
     );
 };
 
-export const createProfile = (profileData, history) => dispatch => {
+export const editProfile = (profileData, history) => dispatch => {
   axios
     .post('/api/profile', profileData)
     .then(res => history.push('/dashboard'))
