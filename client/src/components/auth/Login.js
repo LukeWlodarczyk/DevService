@@ -9,7 +9,7 @@ class Login extends Component {
   constructor() {
     super();
     this.state = {
-      email: '',
+      email_or_username: '',
       password: '',
       errors: {}
     };
@@ -39,7 +39,7 @@ class Login extends Component {
     e.preventDefault();
 
     const userData = {
-      email: this.state.email,
+      email_or_username: this.state.email_or_username,
       password: this.state.password
     };
 
@@ -62,12 +62,12 @@ class Login extends Component {
               <p className="lead text-center">Sign in to your DevService account</p>
               <form noValidate onSubmit={this.onSubmit} >
                 <TextFieldGroup
-                  placeholder="Email Address"
-                  name="email"
-                  type="email"
-                  value={this.state.email}
+                  placeholder="Email Address or username"
+                  name="email_or_username"
+                  type="text"
+                  value={this.state.email_or_username}
                   onChange={this.onChange}
-                  error={errors.email}
+                  error={errors.email_or_username}
                 />
                 <TextFieldGroup
                   placeholder="Password"
