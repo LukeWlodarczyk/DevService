@@ -45,15 +45,15 @@ class PostItem extends Component {
       <div className="card card-body mb-3">
         <div className="row">
           <div className="col-md-2">
-            <a href="profile.html">
+            <Link to={'/profile/'+post.user.username} className="btn btn-info">
               <img
                 className="rounded-circle d-none d-md-block"
                 src={post.avatar}
                 alt=""
               />
-            </a>
-            <br />
-            <p className="text-center">{post.name}</p>
+              <br />
+              <p className="text-center">{post.name}</p>
+            </Link>
           </div>
           <div className="col-md-10">
             <h3>{post.title}</h3>
@@ -98,7 +98,7 @@ class PostItem extends Component {
               )
             }
             {
-              post.user === auth.user.id && (
+              post.user._id === auth.user.id && (
                 <PostButton
                   onClick={this.onDeleteClick}
                   postId={post._id}

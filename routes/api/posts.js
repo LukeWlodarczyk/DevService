@@ -20,6 +20,7 @@ router.get('/', (req, res) => {
   Post
     .find()
     .sort({ date: -1 })
+    .populate('user', ['id', 'username'])
     .then(posts => res.json(posts))
     .catch(err => res.status(404).json({ nopostsfound: 'No posts found' }));
 });
@@ -30,6 +31,7 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   Post
     .findById(req.params.id)
+    .populate('user', ['id', 'username'])
     .then(post => res.json(post))
     .catch(err => res.status(404).json({ nopostfound: 'No post found with that ID' }));
 });
@@ -204,12 +206,13 @@ router.post('/comment/best/:id/:comment_id', passport.authenticate('jwt', { sess
 
   Post
     .findById(req.params.id)
+    .populate('user', ['id', 'username'])
     .then(post => {
       if( !post.comments.some(comment => comment._id.toString() === req.params.comment_id )) {
         return res.status(404).json({ commentnotexists: 'Comment does not exist' });
       };
 
-      if(req.user.id !== post.user.toString()) {
+      if(req.user.id !== post.user._id.toString()) {
          return res.status(401).json({ notauthorized: "User not authorized" });
       };
 

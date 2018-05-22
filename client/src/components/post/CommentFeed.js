@@ -4,7 +4,7 @@ import CommentItem from './CommentItem';
 
 const CommentFeed = ({ comments, postId, postAuthor }) => {
   const best = comments.find(comment => comment.best)
-  const sorted = comments.filter(comment => !comment.best).sort( (a, b) => new Date(b.date) - new Date(a.date));
+  const sorted = comments.filter(comment => !comment.best).sort( (a, b) => new Date(a.date) - new Date(b.date));
   if(!best) {
     return sorted.map(comment => (
         <CommentItem key={comment._id} comment={comment} postId={postId} postAuthor={postAuthor} />

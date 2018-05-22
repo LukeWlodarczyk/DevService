@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { deleteComment, setBestComment } from '../../actions/post';
 
@@ -20,15 +21,14 @@ class CommentItem extends Component {
       <div className={comment.best ? "card card-body mb-3 border-success mb-5" : "card card-body mb-3"}>
         <div className="row">
           <div className="col-md-2">
-            <a href="profile.html">
+            <Link to={'/profile/'+postAuthor.username} className="btn btn-info">
               <img
                 className="rounded-circle d-none d-md-block"
                 src={comment.avatar}
-                alt=""
               />
-            </a>
-            <br />
-            <p className="text-center">{comment.name}</p>
+              <br />
+              <p className="text-center">{comment.name}</p>
+            </Link>
           </div>
           <div className="col-md-10">
             <div className="text-right small">{new Date(comment.date).toLocaleDateString()}</div>
@@ -43,7 +43,7 @@ class CommentItem extends Component {
                   <i className="fas fa-times" />
                 </button>
               ) : null}
-              {postAuthor === auth.user.id ? (
+              {postAuthor._id === auth.user.id ? (
                 <button
                   onClick={this.onSetBestCommentClick}
                   type="button"
