@@ -29,10 +29,13 @@ router.post('/register', (req, res) => {
   }
 
   User
-    .findOne({ email: req.body.email })
+    .findOne({$or:[{email:{$regex: req.body.email, $options: 'i'}},
+                  {username:{$regex: req.body.username, $options: 'i'}}]
+    })
     .then(user => {
       if (user) {
-        errors.email = 'Email already exists';
+        user.email === req.body.email && (errors.email = 'Email already exists');
+        user.username === req.body.username && (errors.username = 'Username already exists');
         return res.status(400).json(errors);
       } else {
         const avatar = gravatar.url(req.body.email, {
@@ -43,6 +46,7 @@ router.post('/register', (req, res) => {
 
         const newUser = new User({
           name: req.body.name,
+          username: req.body.username,
           email: req.body.email,
           password: req.body.password,
           avatar,

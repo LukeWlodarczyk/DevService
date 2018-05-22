@@ -70,7 +70,7 @@ export const getProfiles = () => dispatch => {
     .catch(err =>
       dispatch({
         type: GET_PROFILES,
-        payload: null
+        payload: {}
       })
     );
 };

@@ -10,6 +10,7 @@ class Register extends Component {
     super();
     this.state = {
       name: '',
+      username: '',
       email: '',
       password: '',
       password2: '',
@@ -41,6 +42,7 @@ class Register extends Component {
 
     const newUser = {
       name: this.state.name,
+      username: this.state.username,
       email: this.state.email,
       password: this.state.password,
       password2: this.state.password2
@@ -57,7 +59,7 @@ class Register extends Component {
           <div className="row">
             <div className="col-md-8 m-auto">
               <h1 className="display-4 text-center">Sign Up</h1>
-              <p className="lead text-center">Create your DevConnector account</p>
+              <p className="lead text-center">Create your DevSerivce account</p>
               <form onSubmit={this.onSubmit} noValidate >
                 <TextFieldGroup
                   placeholder="Name"
@@ -65,6 +67,13 @@ class Register extends Component {
                   value={this.state.name}
                   onChange={this.onChange}
                   error={errors.name}
+                />
+                <TextFieldGroup
+                  placeholder="Username"
+                  name="username"
+                  value={this.state.username}
+                  onChange={this.onChange}
+                  error={errors.username}
                 />
                 <TextFieldGroup
                   placeholder="Email"
