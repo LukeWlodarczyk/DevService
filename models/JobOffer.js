@@ -11,7 +11,10 @@ const JobOffer = new Schema({
   },
   email: {
     type: String,
-  }
+  },
+  telephone: {
+    type: String,
+  },
   website: {
     type: String,
   },
