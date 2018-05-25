@@ -81,18 +81,6 @@ class AddOffer extends Component {
   render() {
     const { errors } = this.state;
 
-    const options = [
-      { label: '* Select Professional Status', value: 0 },
-      { label: 'Developer', value: 'Developer' },
-      { label: 'Junior Developer', value: 'Junior Developer' },
-      { label: 'Senior Developer', value: 'Senior Developer' },
-      { label: 'Manager', value: 'Manager' },
-      { label: 'Student or Learning', value: 'Student or Learning' },
-      { label: 'Instructor or Teacher', value: 'Instructor or Teacher' },
-      { label: 'Intern', value: 'Intern' },
-      { label: 'Other', value: 'Other' }
-    ];
-
     return (
       <div className="edit-profile">
         <div className="container">
@@ -105,14 +93,14 @@ class AddOffer extends Component {
               <small className="d-block pb-3">* = required fields</small>
               <form onSubmit={this.onSubmit}>
                 <TextFieldGroup
-                  placeholder="Position"
+                  placeholder="* Position"
                   name="position"
                   value={this.state.position}
                   onChange={this.onChange}
                   error={errors.position}
                 />
                 <TextFieldGroup
-                  placeholder="Company"
+                  placeholder="* Company"
                   name="company"
                   value={this.state.company}
                   onChange={this.onChange}
@@ -126,7 +114,7 @@ class AddOffer extends Component {
                   error={errors.website}
                 />
                 <TextFieldGroup
-                  placeholder="Email"
+                  placeholder="* Email"
                   name="email"
                   value={this.state.email}
                   onChange={this.onChange}
@@ -140,7 +128,7 @@ class AddOffer extends Component {
                   error={errors.phoneNumber}
                 />
                 <TextFieldGroup
-                  placeholder="Location"
+                  placeholder="* Location"
                   name="location"
                   value={this.state.location}
                   onChange={this.onChange}
@@ -157,7 +145,7 @@ class AddOffer extends Component {
                     HTML,CSS,JavaScript,PHP"
                 />
                 <TextFieldGroup
-                  placeholder="What can you offer?"
+                  placeholder="* What can you offer?"
                   name="canOffer"
                   value={this.state.canOffer}
                   onChange={this.onChange}
@@ -174,7 +162,7 @@ class AddOffer extends Component {
                   info="Please use comma separated values"
                 />
                 <TextFieldGroup
-                  placeholder="Languages"
+                  placeholder="* Languages"
                   name="languages"
                   value={this.state.languages}
                   onChange={this.onChange}
@@ -182,7 +170,7 @@ class AddOffer extends Component {
                   info="Please use comma separated values"
                 />
                 <TextFieldGroup
-                  placeholder="Description"
+                  placeholder="* Description"
                   name="description"
                   value={this.state.description}
                   onChange={this.onChange}
