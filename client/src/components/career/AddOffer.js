@@ -6,7 +6,8 @@ import TextFieldGroup from '../common/TextFieldGroup';
 import TextAreaFieldGroup from '../common/TextAreaFieldGroup';
 import InputGroup from '../common/InputGroup';
 import SelectListGroup from '../common/SelectListGroup';
-import { addOffer, getCurrentOffer, clearErrors } from '../../actions/profile';
+import { clearErrors } from '../../actions/profile';
+import { addOffer, getCurrentOffer } from '../../actions/career';
 
 class AddOffer extends Component {
   constructor(props) {

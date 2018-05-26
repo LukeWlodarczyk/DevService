@@ -51,11 +51,6 @@ const validateOfferInput = data => {
 
   const siteUrls = [
     'website',
-    'youtube',
-    'twitter',
-    'facebook',
-    'linkedin',
-    'instagram',
   ]
 
   siteUrls.forEach(field => {
