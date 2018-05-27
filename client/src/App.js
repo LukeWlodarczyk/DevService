@@ -24,6 +24,8 @@ import Profile from './components/profile/Profile';
 import Posts from './components/posts/Posts';
 import Post from './components/post/Post';
 import AddOffer from './components/career/AddOffer';
+import Offer from './components/career/Offer';
+import Offers from './components/career/Offers';
 import NotFound from './components/not-found/NotFound';
 
 import './App.css';
@@ -60,7 +62,9 @@ class App extends Component {
                 <PrivateRoute exact path="/add-education" component={AddEducation} />
                 <PrivateRoute exact path="/feed" component={Posts} />
                 <PrivateRoute exact path="/post/:id" component={Post} />
+                <PrivateRoute exact path="/offers" component={Offers} />
                 <PrivateRoute exact path="/add-job" component={AddOffer} />
+                <PrivateRoute exact path="/offer/:id" component={Offer} />
               </Switch>
               <Route exact path="/not-found" component={NotFound} />
             </div>

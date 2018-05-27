@@ -7,7 +7,7 @@ import TextAreaFieldGroup from '../common/TextAreaFieldGroup';
 import InputGroup from '../common/InputGroup';
 import SelectListGroup from '../common/SelectListGroup';
 import { clearErrors } from '../../actions/profile';
-import { addOffer, getCurrentOffer } from '../../actions/career';
+import { addOffer } from '../../actions/career';
 
 class AddOffer extends Component {
   constructor(props) {
@@ -29,24 +29,15 @@ class AddOffer extends Component {
   }
 
   componentDidMount() {
-    if(this.props.profile.profile === null) {
-      return this.props.history.push('/dashboard');
-    }
     if(Object.keys(this.props.errors).length !== 0) {
       this.props.clearErrors();
     }
-    this.props.getCurrentOffer();
   }
 
   static getDerivedStateFromProps = (nextProps) => {
-    if(Object.keys(nextProps.errors).length || nextProps.profile.profile) {
-      const profile = nextProps.profile.profile;
-      const skills = profile.skills.join(',');
+    if(Object.keys(nextProps.errors).length) {
       return {
         errors: nextProps.errors,
-        ...profile,
-        ...profile.social,
-        skills,
       }
     }
 
@@ -90,7 +81,7 @@ class AddOffer extends Component {
               <Link to="/dashboard" className="btn btn-light">
                 Go Back
               </Link>
-              <h1 className="display-4 text-center">Edit Profile</h1>
+              <h1 className="display-4 text-center">Add offer</h1>
               <small className="d-block pb-3">* = required fields</small>
               <form onSubmit={this.onSubmit}>
                 <TextFieldGroup
@@ -143,7 +134,7 @@ class AddOffer extends Component {
                   onChange={this.onChange}
                   error={errors.requirements}
                   info="Please use comma separated values (eg.
-                    HTML,CSS,JavaScript,PHP"
+                    HTML,CSS,JavaScript,PHP)"
                 />
                 <TextFieldGroup
                   placeholder="* What can you offer?"
@@ -152,7 +143,7 @@ class AddOffer extends Component {
                   onChange={this.onChange}
                   error={errors.canOffer}
                   info="Please use comma separated values (eg.
-                    Private health care, Play room, Kitchen"
+                    Private health care, Play room, Kitchen)"
                 />
                 <TextFieldGroup
                   placeholder="Nice to have"
@@ -170,12 +161,17 @@ class AddOffer extends Component {
                   error={errors.languages}
                   info="Please use comma separated values"
                 />
-                <TextFieldGroup
+                <TextAreaFieldGroup
                   placeholder="* Description"
                   name="description"
                   value={this.state.description}
                   onChange={this.onChange}
                   error={errors.description}
+                />
+                <input
+                  type="submit"
+                  value="Submit"
+                  className="btn btn-info btn-block mt-4"
                 />
               </form>
             </div>
@@ -188,7 +184,6 @@ class AddOffer extends Component {
 
 AddOffer.propTypes = {
   addOffer: PropTypes.func.isRequired,
-  getCurrentOffer: PropTypes.func.isRequired,
   clearErrors: PropTypes.func.isRequired,
   offer: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired
@@ -199,4 +194,4 @@ const mapStateToProps = state => ({
   errors: state.errors
 });
 
-export default connect(mapStateToProps, { addOffer, getCurrentOffer, clearErrors })(AddOffer);
+export default connect(mapStateToProps, { addOffer, clearErrors })(AddOffer);
