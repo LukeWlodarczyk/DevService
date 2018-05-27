@@ -4,6 +4,8 @@ const isEmpty = require('./is-empty');
 const validateOfferInput = data => {
   const errors = {};
 
+  console.log(data);
+
   data.position = !isEmpty(data.position) ? data.position : '';
   data.company = !isEmpty(data.company) ? data.company : '';
   data.email = !isEmpty(data.email) ? data.email : '';
@@ -17,16 +19,16 @@ const validateOfferInput = data => {
     errors.position = 'Position field is required';
   }
 
-  if (Validator.isEmpty(data.skills)) {
-    errors.skills = 'Skills field is required';
-  }
-
   if (Validator.isEmpty(data.company)) {
     errors.company = 'Company field is required';
   }
 
-  if (Validator.isEmail(data.email)) {
+  if (!Validator.isEmail(data.email)) {
     errors.email = 'Email is not valid';
+  }
+
+  if (Validator.isEmpty(data.email)) {
+    errors.email = 'Email field is required';
   }
 
   if (Validator.isEmpty(data.location)) {

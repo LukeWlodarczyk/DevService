@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const JobOffer = new Schema({
+const JobOfferSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
     ref: 'users',
@@ -35,7 +35,7 @@ const JobOffer = new Schema({
   },
   canOffer: {
     type: [String],
-  }
+  },
   description: {
     type: String,
   },
@@ -45,4 +45,4 @@ const JobOffer = new Schema({
   }
 });
 
-module.exports = Profile = mongoose.model('profile', ProfileSchema);
+module.exports = JobOffer = mongoose.model('jobOffer', JobOfferSchema);

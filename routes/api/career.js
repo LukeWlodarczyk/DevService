@@ -3,7 +3,39 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const passport = require('passport');
 
+const JobOffer = require('../../models/JobOffer');
 
+const validateOfferInput = require('../../validation/jobOffer');
+
+
+// @route   GET api/career/all
+// @desc    Get all offers
+// @access  Public
+router.get('/all', (req, res) => {
+  const errors = {};
+  JobOffer
+    .find()
+    .populate('user', ['name', 'avatar'])
+    .then(offers => {
+      if(!offers || offers.length === 0) {
+        errors.nooffers = 'There are no offers';
+        return res.status(404).send(errors);
+      }
+      res.json(offers);
+    })
+    .catch(err => res.status(404).json({ offers: 'There are no offers' }));
+});
+
+// @route   GET api/career/:id
+// @desc    Get offer by id
+// @access  Public
+router.get('/:id', (req, res) => {
+  JobOffer
+    .findById(req.params.id)
+    .populate('user', ['id', 'username'])
+    .then(offer => res.json(offer))
+    .catch(err => res.status(404).json({ noofferfound: 'No offer found with that ID' }));
+});
 
 // @route   POST api/career
 // @desc    Add job offer
@@ -18,36 +50,76 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
 
   const jobOffer = {};
   jobOffer.user = req.user.id;
-  if (req.body.company) jobOffer.company = req.body.company;
-  if (req.body.website) jobOffer.website = req.body.website;
-  if (req.body.location) jobOffer.location = req.body.location;
-  if (req.body.email) jobOffer.email = req.body.email;
-  if (req.body.phoneNumber) jobOffer.phoneNumber = req.body.phoneNumber;
-  if (req.body.position) jobOffer.position = req.body.position;
-  if (req.body.requirements) jobOffer.requirements = req.body.requirements;
-  if (req.body.niceToHave) jobOffer.niceToHave = req.body.niceToHave;
-  if (req.body.description) jobOffer.description = req.body.description;
-  if (req.body.languages) jobOffer.languages = req.body.languages;
-  if (req.body.canOffer) jobOffer.canOffer = req.body.canOffer;
 
-  if (typeof req.body.skills !== 'undefined') {
-    jobOffer.skills = req.body.skills
-     .split(",")
-     .map(item => item.trim());
-  }
+  const offerFields = [
+    'company',
+    'website',
+    'location',
+    'email',
+    'phoneNumber',
+    'position',
+    'description',
+  ];
+
+  offerFields.map( field => {
+    if(req.body[field]) jobOffer[field] = req.body[field];
+  })
+
+  const arraySkills = [
+    'requirements',
+    'niceToHave',
+    'languages',
+    'canOffer',
+  ];
+
+  arraySkills.map( field => {
+    if(typeof req.body[field] !== 'undefined') {
+      jobOffer[field] = req.body[field]
+       .split(",")
+       .map(item => item.trim());
+    }
+  })
 
 
   JobOffer
-    .findById(req.params.id)
-    .then( offer => {
-      offer
-        .update({ $set: jobOffer }, { new: true })
-        .then(profile => res.json(offer))
-        .catch(err => res.json(err));
-    })
-    .catch( err => res.json(err));
+    .create(jobOffer)
+    .then(offer => res.json(offer))
+    .catch(err => res.json(err))
+
+  // JobOffer
+  //   .findById(req.params.id)
+  //   .then( offer => {
+  //     offer
+  //       .update({ $set: jobOffer }, { new: true })
+  //       .then(offer => res.json(offer))
+  //       .catch(err => res.json(err));
+  //   })
+  //   .catch( err => res.json(err));
 
 });
+
+// @route   DELETE api/carrer/:id
+// @desc    Remove offer
+// @access  Private
+router.delete('/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+    JobOffer
+      .findById(req.params.id)
+      .then(offer => {
+        if(!offer) {
+          return res.status(404).json({ offernotexists: 'Offer does not exist' });
+        };
+
+        if(req.user.id !== offer.user.toString()) {
+           return res.status(401).json({ notauthorized: "User not authorized" });
+        };
+
+        offer
+          .remove()
+          .catch(err => res.json(err));
+      })
+      .catch(err => res.status(404).json({ offernotfound: 'No offer found' }));
+  }
+);
 
 
 module.exports = router;
