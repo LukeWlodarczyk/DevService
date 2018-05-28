@@ -3,7 +3,8 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import Spinner from '../common/Spinner';
-import OfferInfo from './OfferInfo';
+import OfferHeading from './OfferHeading';
+import OfferDetails from './OfferDetails';
 import { getOffer } from '../../actions/career';
 
 class Offer extends Component {
@@ -21,6 +22,7 @@ class Offer extends Component {
 
   render() {
     const { offer, loading } = this.props.career;
+    console.log(offer);
     let offerContent;
 
     if (offer === null || !Object.keys(offer).length || loading) {
@@ -36,7 +38,8 @@ class Offer extends Component {
             </div>
             <div className="col-md-6" />
           </div>
-          <OfferInfo offer={offer} />
+          <OfferHeading offer={offer} />
+          <OfferDetails offer={offer} />
         </div>
       );
     }

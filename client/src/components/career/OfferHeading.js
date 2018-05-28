@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const OfferInfo = ({ offer }) => (
+const OfferHeading = ({ offer }) => (
       <div className="row">
         <div className="col-md-12">
           <div className="card card-body bg-info text-white mb-3">
@@ -12,19 +12,7 @@ const OfferInfo = ({ offer }) => (
                   <span>at {offer.company}</span>
                 )}
               </h1>
-              <p>{offer.location}</p>
-              <p className="text-center">{offer.user.name}</p>
-              <p>
-                {offer.website && (
-                  <a
-                    className="text-white p-2"
-                    href={offer.website}
-                    target="_blank"
-                  >
-                    <i className="fas fa-globe fa-2x" />
-                  </a>
-                )}
-              </p>
+              <p className="mb-0">{offer.location}</p>
             </div>
           </div>
         </div>
@@ -32,8 +20,8 @@ const OfferInfo = ({ offer }) => (
 );
 
 
-OfferInfo.propTypes = {
+OfferHeading.propTypes = {
   offer: PropTypes.object.isRequired,
 };
 
-export default OfferInfo;
+export default OfferHeading;

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Spinner from '../common/Spinner';
-import OfferInfo from './OfferInfo';
+import OfferHeading from './OfferHeading';
 import { Link } from 'react-router-dom';
 import { getOffers } from '../../actions/career';
 
@@ -22,8 +22,8 @@ class Offers extends Component {
     } else {
       if (offers.length > 0) {
         offerItems = offers.map(offer => (
-          <Link key={offer._id} to={'offer/'+offer._id}>
-            <OfferInfo offer={offer} />
+          <Link style={{ textDecoration: 'none' }} key={offer._id} to={'offer/'+offer._id}>
+            <OfferHeading offer={offer} />
           </Link>
         ));
       } else {
@@ -38,7 +38,7 @@ class Offers extends Component {
             <div className="col-md-12">
               <h1 className="display-4 text-center">Offers</h1>
               <p className="lead text-center">
-                Browse and connect with developers
+                Find your dream job!
               </p>
               {offerItems}
             </div>
