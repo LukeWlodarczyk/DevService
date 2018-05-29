@@ -37,6 +37,16 @@ export default (state = initialState, action) => {
         ...state,
         offers: [action.payload, ...state.offers],
       };
+    case EDIT_OFFER:
+      return {
+        ...state,
+        offers: state.offers.map( offer => {
+          if(offer._id === action.payload._id) {
+            return action.payload;
+          }
+          return offer;
+        })
+      };
     case DELETE_OFFER:
       return {
         ...state,

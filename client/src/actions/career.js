@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {
   OFFER_LOADING,
+  EDIT_OFFER,
   ADD_OFFER,
   DELETE_OFFER,
   GET_OFFERS,
@@ -9,7 +10,7 @@ import {
   CLEAR_ERRORS,
 } from '../constants/action-types';
 
-export const getOffer = (offerId) => dispatch => {
+export const getOffer = offerId => dispatch => {
   dispatch(setOfferLoading());
   axios
     .get('/api/career/'+offerId)
@@ -49,9 +50,10 @@ export const addOffer = (offerData, history) => dispatch => {
   axios
     .post('/api/career/', offerData)
     .then(res => {
+      console.log(res.data);
       history.push('/offer/'+res.data._id);
       dispatch({
-        type: ADD_OFFER,
+        type: !offerData.id ? ADD_OFFER : EDIT_OFFER,
         payload: res.data
       })
     })
@@ -66,7 +68,7 @@ export const addOffer = (offerData, history) => dispatch => {
 export const deleteOffer = (offerId, history) => dispatch => {
   axios
     .delete('/api/career/'+offerId)
-    .then(res => {
+    .then(() => {
       history.push('/offers');
       dispatch({
         type: DELETE_OFFER,

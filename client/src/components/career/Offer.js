@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import Spinner from '../common/Spinner';
 import OfferHeading from './OfferHeading';
 import OfferDetails from './OfferDetails';
-import { getOffer } from '../../actions/career';
+import { getOffer, deleteOffer } from '../../actions/career';
 
 class Offer extends Component {
   componentDidMount() {
@@ -20,9 +20,12 @@ class Offer extends Component {
     }
   }
 
+  deleteOffer = () => {
+    this.props.deleteOffer(this.props.match.params.id, this.props.history);
+  }
+
   render() {
-    const { offer, loading } = this.props.career;
-    console.log(offer);
+    const { career: { offer, loading }, auth } = this.props;
     let offerContent;
 
     if (offer === null || !Object.keys(offer).length || loading) {
@@ -38,7 +41,7 @@ class Offer extends Component {
             </div>
             <div className="col-md-6" />
           </div>
-          <OfferHeading offer={offer} />
+          <OfferHeading offer={offer} auth={auth} deleteOffer={this.deleteOffer} displayActions={true} />
           <OfferDetails offer={offer} />
         </div>
       );
@@ -62,7 +65,8 @@ Offer.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  career: state.career
+  career: state.career,
+  auth: state.auth,
 });
 
-export default connect(mapStateToProps, { getOffer })(Offer);
+export default connect(mapStateToProps, { getOffer, deleteOffer })(Offer);

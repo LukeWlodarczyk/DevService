@@ -65,6 +65,7 @@ class App extends Component {
                 <PrivateRoute exact path="/offers" component={Offers} />
                 <PrivateRoute exact path="/add-job" component={AddOffer} />
                 <PrivateRoute exact path="/offer/:id" component={Offer} />
+                <PrivateRoute exact path="/offer/:id/edit" component={AddOffer} />
               </Switch>
               <Route exact path="/not-found" component={NotFound} />
             </div>

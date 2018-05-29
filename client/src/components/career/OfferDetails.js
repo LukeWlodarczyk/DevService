@@ -19,12 +19,12 @@ const OfferDetails = ({ offer }) => (
             </div>
 
             <div>
-              <h3 className="text-center text-info">Languages</h3>
+              <h3 className="text-center text-info">Nice to have</h3>
               <div className="row d-flex flex-wrap justify-content-center align-items-center mb-3">
                 {
-                  offer.languages.map((item, index) => (
+                  offer.niceToHave.map((skill, index) => (
                     <div key={index} className="p-3">
-                      <i className="fa fa-check" /> {item}
+                      <i className="fa fa-check" /> {skill}
                     </div>
                   ))
                 }
@@ -32,12 +32,12 @@ const OfferDetails = ({ offer }) => (
             </div>
 
             <div>
-              <h3 className="text-center text-info">Nice to have</h3>
+              <h3 className="text-center text-info">Languages</h3>
               <div className="row d-flex flex-wrap justify-content-center align-items-center mb-3">
                 {
-                  offer.niceToHave.map((skill, index) => (
+                  offer.languages.map((item, index) => (
                     <div key={index} className="p-3">
-                      <i className="fa fa-check" /> {skill}
+                      <i className="fa fa-check" /> {item}
                     </div>
                   ))
                 }
