@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import TextFieldGroup from '../common/TextFieldGroup';
 import TextAreaFieldGroup from '../common/TextAreaFieldGroup';
 import { clearErrors } from '../../actions/profile';
-import { addOffer } from '../../actions/career';
+import { addOffer, getOffer } from '../../actions/career';
 
 class AddOffer extends Component {
   constructor(props) {
@@ -30,12 +30,31 @@ class AddOffer extends Component {
     if(Object.keys(this.props.errors).length !== 0) {
       this.props.clearErrors();
     }
+
+    if(this.props.match.params.id) {
+      this.props.getOffer(this.props.match.params.id);
+    }
   }
 
-  static getDerivedStateFromProps = (nextProps) => {
+  static getDerivedStateFromProps(nextProps) {
     if(Object.keys(nextProps.errors).length) {
+      nextProps.clearErrors();
       return {
         errors: nextProps.errors,
+      }
+    }
+
+    if(nextProps.match.params.id && Object.keys(nextProps.offer).length) {
+      let { _id, user, ...data } = nextProps.offer;
+
+      for(const key in data) {
+        if(Array.isArray(data[key])) {
+          data[key] = data[key].join(', ')
+        }
+        data[key] = data[key]
+      }
+      return {
+        ...data,
       }
     }
 
@@ -60,6 +79,8 @@ class AddOffer extends Component {
       canOffer: this.state.canOffer,
     }
 
+    this.props.match.params.id && (offerData.id = this.props.match.params.id);
+
     this.props.addOffer(offerData, this.props.history);
   }
 
@@ -70,16 +91,19 @@ class AddOffer extends Component {
 
   render() {
     const { errors } = this.state;
+    const { id } = this.props.match.params;
+
+    const url = id ? `/offer/${id}` : '/dashboard'
 
     return (
       <div className="edit-profile">
         <div className="container">
           <div className="row">
             <div className="col-md-8 m-auto">
-              <Link to="/dashboard" className="btn btn-light">
+              <Link to={url} className="btn btn-light">
                 Go Back
               </Link>
-              <h1 className="display-4 text-center">Add offer</h1>
+              <h1 className="display-4 text-center">{this.props.match.params.id ? 'Edit offer' : 'Add offer'}</h1>
               <small className="d-block pb-3">* = required fields</small>
               <form onSubmit={this.onSubmit}>
                 <TextFieldGroup
@@ -182,6 +206,7 @@ class AddOffer extends Component {
 
 AddOffer.propTypes = {
   addOffer: PropTypes.func.isRequired,
+  getOffer: PropTypes.func.isRequired,
   clearErrors: PropTypes.func.isRequired,
   offer: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired
@@ -192,4 +217,4 @@ const mapStateToProps = state => ({
   errors: state.errors
 });
 
-export default connect(mapStateToProps, { addOffer, clearErrors })(AddOffer);
+export default connect(mapStateToProps, { addOffer, getOffer, clearErrors })(AddOffer);
