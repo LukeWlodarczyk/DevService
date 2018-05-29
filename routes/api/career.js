@@ -38,7 +38,7 @@ router.get('/:id', (req, res) => {
 });
 
 // @route   POST api/career
-// @desc    Add job offer
+// @desc    Add or edit job offer
 // @access  Private
 router.post('/', passport.authenticate('jwt', { session: false }), (req, res) => {
 
@@ -80,21 +80,27 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
     }
   })
 
+  if(req.body.id) {
+    JobOffer
+      .findById(req.body.id)
+      .populate('user', ['id'])
+      .then(offer => {
+        if(req.user.id !== offer.user._id.toString()) {
+           return res.status(401).json({ notauthorized: "User not authorized" });
+        };
+
+        JobOffer
+          .findByIdAndUpdate(req.body.id, { $set: jobOffer }, { new: true })
+          .then(offer => res.json(offer))
+          .catch(err => res.json(err));
+      })
+      return;
+  }
 
   JobOffer
     .create(jobOffer)
     .then(offer => res.json(offer))
     .catch(err => res.json(err))
-
-  // JobOffer
-  //   .findById(req.params.id)
-  //   .then( offer => {
-  //     offer
-  //       .update({ $set: jobOffer }, { new: true })
-  //       .then(offer => res.json(offer))
-  //       .catch(err => res.json(err));
-  //   })
-  //   .catch( err => res.json(err));
 
 });
 
@@ -115,6 +121,7 @@ router.delete('/:id', passport.authenticate('jwt', { session: false }), (req, re
 
         offer
           .remove()
+          .then( () => res.json({ success: true }))
           .catch(err => res.json(err));
       })
       .catch(err => res.status(404).json({ offernotfound: 'No offer found' }));
