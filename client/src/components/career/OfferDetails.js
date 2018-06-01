@@ -64,6 +64,11 @@ const OfferDetails = ({ offer }) => (
               <p className="mb-0">{offer.description}</p>
             </div>
           </div>
+          <div className="card card-body bg-info text-white mb-3">
+            <div className="text-center">
+              <p className="mb-0">Contact us at {offer.email}</p>
+            </div>
+          </div>
         </div>
       </div>
     );
