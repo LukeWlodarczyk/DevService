@@ -84,11 +84,13 @@ class Navbar extends Component {
                   Developers
                 </Link>
               </li>
-              <li className="nav-item">
-                <Link className="nav-link" to="/offers">
-                  Career
-                </Link>
-              </li>
+              {isAuthenticated && (
+                <li className="nav-item">
+                  <Link className="nav-link" to="/offers">
+                    Career
+                  </Link>
+                </li>)
+              }
             </ul>
             {isAuthenticated ? authLinks : guestLinks}
           </div>
