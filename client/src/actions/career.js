@@ -7,7 +7,6 @@ import {
   GET_OFFERS,
   GET_OFFER,
   GET_ERRORS,
-  CLEAR_ERRORS,
 } from '../constants/action-types';
 
 export const getOffer = offerId => dispatch => {
@@ -23,7 +22,7 @@ export const getOffer = offerId => dispatch => {
     .catch(err =>
       dispatch({
         type: GET_OFFER,
-        payload: {}
+        payload: err.response.data
       })
     );
 };
@@ -41,7 +40,7 @@ export const getOffers = () => dispatch => {
     .catch(err =>
       dispatch({
         type: GET_OFFERS,
-        payload: []
+        payload: err.response.data
       })
     );
 };
@@ -50,12 +49,11 @@ export const addOffer = (offerData, history) => dispatch => {
   axios
     .post('/api/career/', offerData)
     .then(res => {
-      console.log(res.data);
-      history.push('/offer/'+res.data._id);
       dispatch({
         type: !offerData.id ? ADD_OFFER : EDIT_OFFER,
         payload: res.data
       })
+      history.push('/offer/'+res.data._id);
     })
     .catch(err =>
       dispatch({

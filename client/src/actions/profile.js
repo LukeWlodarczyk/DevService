@@ -40,7 +40,7 @@ export const getProfileByUsername = username => dispatch => {
     .catch(err =>
       dispatch({
         type: GET_PROFILE,
-        payload: null
+        payload: err.response.data
       })
     );
 };
