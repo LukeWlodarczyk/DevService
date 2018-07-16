@@ -6,8 +6,8 @@ import {
 } from '../constants/action-types';
 
 const initialState = {
-  profile: null,
-  profiles: null,
+  profile: {},
+  profiles: [],
   loading: false
 };
 

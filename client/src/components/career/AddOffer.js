@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import NotFound from '../not-found/NotFound'
 import TextFieldGroup from '../common/TextFieldGroup';
 import TextAreaFieldGroup from '../common/TextAreaFieldGroup';
 import { clearErrors } from '../../actions/profile';
@@ -93,7 +94,11 @@ class AddOffer extends Component {
     const { errors } = this.state;
     const { id } = this.props.match.params;
 
-    const url = id ? `/offer/${id}` : '/dashboard'
+    const url = id ? `/offer/${id}` : '/dashboard';
+
+    if (this.props.offer.error) {
+      return <NotFound error={this.props.offer} />
+    }
 
     return (
       <div className="edit-profile">

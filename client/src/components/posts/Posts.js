@@ -15,10 +15,14 @@ class Posts extends Component {
     const { posts, loading } = this.props.post;
     let postContent;
 
-    if (posts === null || loading) {
+    if (loading) {
       postContent = <Spinner />;
     } else {
-      postContent = <PostFeed posts={posts} />;
+      if(posts.length === 0) {
+        postContent = <h4>No offers find...</h4>;
+      } else {
+        postContent = <PostFeed posts={posts} />;
+      }
     }
 
     return (

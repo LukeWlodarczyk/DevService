@@ -15,7 +15,7 @@ class Offers extends Component {
     const { offers, loading } = this.props.career;
     let offerItems;
 
-    if (offers === null || loading) {
+    if (loading) {
       offerItems = <Spinner />;
     } else {
       if (offers.length > 0) {

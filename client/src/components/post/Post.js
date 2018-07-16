@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import PostItem from '../posts/PostItem';
 import CommentForm from './CommentForm';
 import CommentFeed from './CommentFeed';
+import NotFound from '../not-found/NotFound';
 import Spinner from '../common/Spinner';
 import { getPost } from '../../actions/post';
 
@@ -17,7 +18,11 @@ class Post extends Component {
     const { post, loading } = this.props.post;
     let postContent;
 
-    if (post === null || loading || Object.keys(post).length === 0) {
+    if(post.error) {
+      return <NotFound error={post} />
+    }
+
+    if (loading || Object.keys(post).length === 0) {
       postContent = <Spinner />;
     } else {
       postContent = (

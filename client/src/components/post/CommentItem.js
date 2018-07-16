@@ -34,7 +34,7 @@ class CommentItem extends Component {
             <div className="text-left text-sm-right small">{new Date(comment.date).toLocaleDateString()}</div>
             <p className="lead">{comment.text}</p>
             <div className="text-center text-sm-left">
-              {comment.user === auth.user.id ? (
+              {comment.user._id === auth.user.id ? (
                 <button
                   onClick={this.onDeleteClick}
                   type="button"

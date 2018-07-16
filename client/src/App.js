@@ -26,7 +26,6 @@ import Post from './components/post/Post';
 import AddOffer from './components/career/AddOffer';
 import Offer from './components/career/Offer';
 import Offers from './components/career/Offers';
-import NotFound from './components/not-found/NotFound';
 
 import './App.css';
 
@@ -51,23 +50,22 @@ class App extends Component {
             <Navbar />
             <Route exact path='/' component={Landing} />
             <div className="container">
-              <Route exact path="/register" component={Register} />
-              <Route exact path="/login" component={Login} />
-              <Route exact path="/profiles" component={Profiles} />
-              <Route exact path="/profile/:username" component={Profile} />
+              <Route path="/register" component={Register} />
+              <Route path="/login" component={Login} />
+              <Route path="/profiles" component={Profiles} />
+              <Route path="/profile/:username" component={Profile} />
               <Switch>
-                <PrivateRoute exact path="/dashboard" component={Dashboard} />
-                <PrivateRoute exact path="/edit-profile" component={EditProfile} />
-                <PrivateRoute exact path="/add-experience" component={AddExperience} />
-                <PrivateRoute exact path="/add-education" component={AddEducation} />
-                <PrivateRoute exact path="/feed" component={Posts} />
-                <PrivateRoute exact path="/post/:id" component={Post} />
-                <PrivateRoute exact path="/offers" component={Offers} />
-                <PrivateRoute exact path="/add-job" component={AddOffer} />
+                <PrivateRoute path="/dashboard" component={Dashboard} />
+                <PrivateRoute path="/edit-profile" component={EditProfile} />
+                <PrivateRoute path="/add-experience" component={AddExperience} />
+                <PrivateRoute path="/add-education" component={AddEducation} />
+                <PrivateRoute path="/feed" component={Posts} />
+                <PrivateRoute path="/post/:id" component={Post} />
+                <PrivateRoute path="/offers" component={Offers} />
+                <PrivateRoute path="/add-job" component={AddOffer} />
                 <PrivateRoute exact path="/offer/:id" component={Offer} />
-                <PrivateRoute exact path="/offer/:id/edit" component={AddOffer} />
+                <PrivateRoute path="/offer/:id/edit" component={AddOffer} />
               </Switch>
-              <Route exact path="/not-found" component={NotFound} />
             </div>
             <Footer />
           </div>

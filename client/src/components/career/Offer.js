@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import NotFound from '../not-found/NotFound'
 import Spinner from '../common/Spinner';
 import OfferHeading from './OfferHeading';
 import OfferDetails from './OfferDetails';
@@ -14,12 +15,6 @@ class Offer extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.career.offer === null && this.props.career.loading) {
-      this.props.history.push('/not-found');
-    }
-  }
-
   deleteOffer = () => {
     this.props.deleteOffer(this.props.match.params.id, this.props.history);
   }
@@ -28,7 +23,11 @@ class Offer extends Component {
     const { career: { offer, loading }, auth } = this.props;
     let offerContent;
 
-    if (offer === null || !Object.keys(offer).length || loading) {
+    if (offer.error) {
+      return <NotFound error={offer} />
+    }
+
+    if (!Object.keys(offer).length || loading) {
       offerContent = <Spinner />;
     } else {
       offerContent = (

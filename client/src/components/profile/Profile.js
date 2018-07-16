@@ -7,6 +7,7 @@ import ProfileAbout from './ProfileAbout';
 import ProfileCreds from './ProfileCreds';
 import ProfileGithub from './ProfileGithub';
 import Spinner from '../common/Spinner';
+import NotFound from '../not-found/NotFound'
 import { getProfileByUsername } from '../../actions/profile';
 
 class Profile extends Component {
@@ -16,17 +17,16 @@ class Profile extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.profile.profile === null && this.props.profile.loading) {
-      this.props.history.push('/not-found');
-    }
-  }
 
   render() {
     const { profile, loading } = this.props.profile;
     let profileContent;
 
-    if (profile === null || !Object.keys(profile).length || loading) {
+    if(profile.error) {
+      return <NotFound error={profile} />
+    }
+
+    if (loading || Object.keys(profile).length === 0) {
       profileContent = <Spinner />;
     } else {
       profileContent = (
