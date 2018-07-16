@@ -32,7 +32,10 @@ router.get('/:id', (req, res) => {
   Post
     .findById(req.params.id)
     .populate('user', ['id', 'username', 'name', 'avatar'])
-    .then(post => res.json(post))
+    .populate('comments.user', ['username', 'name', 'avatar'])
+    .then(post => {
+      res.json(post)
+    })
     .catch(err => res.status(404).json({ nopostfound: 'No post found with that ID' }));
 });
 
@@ -153,8 +156,6 @@ router.post('/comment/:id', passport.authenticate('jwt', { session: false }), (r
       .then(post => {
         const newComment = {
           text: req.body.text,
-          name: req.body.name,
-          avatar: req.body.avatar,
           user: req.user.id
         };
 
@@ -204,7 +205,7 @@ router.post('/comment/best/:id/:comment_id', passport.authenticate('jwt', { sess
 
   Post
     .findById(req.params.id)
-    .populate('user', ['id', 'username'])
+    .populate('user', ['id'])
     .then(post => {
       if( !post.comments.some(comment => comment._id.toString() === req.params.comment_id )) {
         return res.status(404).json({ commentnotexists: 'Comment does not exist' });
@@ -216,7 +217,7 @@ router.post('/comment/best/:id/:comment_id', passport.authenticate('jwt', { sess
 
       post.comments.forEach( comment => {
         if(comment._id.toString() === req.params.comment_id) {
-          comment.best = comment.best ? false : true;
+          comment.best = !comment.best
         } else {
           comment.best = false
         }

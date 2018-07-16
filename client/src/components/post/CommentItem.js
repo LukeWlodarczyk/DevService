@@ -21,13 +21,13 @@ class CommentItem extends Component {
       <div className={comment.best ? "card card-body sm-3 border-success mb-5" : "card card-body sm-3 mb-3"}>
         <div className="row">
           <div className="col-sm-2">
-            <Link to={'/profile/'+postAuthor.username} className="btn btn-info">
+            <Link to={'/profile/'+comment.user.username} className="btn btn-info">
               <img
                 className="rounded-circle d-none d-sm-block"
-                src={comment.avatar}
+                src={comment.user.avatar}
               />
               <br />
-              <p className="text-center">{comment.name}</p>
+              <p className="text-center">{comment.user.name}</p>
             </Link>
           </div>
           <div className="col-sm-10">
