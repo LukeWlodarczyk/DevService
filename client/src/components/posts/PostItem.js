@@ -40,7 +40,7 @@ class PostItem extends Component {
 
   render() {
     const { post, auth, showActions, truncate } = this.props;
-
+    console.log(post);
     return (
       <div className="card card-body sm-3 mb-3">
         <div className="row">
@@ -48,11 +48,11 @@ class PostItem extends Component {
             <Link to={'/profile/'+post.user.username} className="btn btn-info">
               <img
                 className="rounded-circle d-none d-sm-block"
-                src={post.avatar}
+                src={post.user.avatar}
                 alt=""
               />
               <br />
-              <p className="text-center">{post.name}</p>
+              <p className="text-center">{post.user.name}</p>
             </Link>
           </div>
           <div className="col-sm-10">

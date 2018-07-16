@@ -20,7 +20,7 @@ router.get('/', (req, res) => {
   Post
     .find()
     .sort({ date: -1 })
-    .populate('user', ['id', 'username'])
+    .populate('user', ['id', 'username', 'name', 'avatar'])
     .then(posts => res.json(posts))
     .catch(err => res.status(404).json({ nopostsfound: 'No posts found' }));
 });
@@ -31,7 +31,7 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   Post
     .findById(req.params.id)
-    .populate('user', ['id', 'username'])
+    .populate('user', ['id', 'username', 'name', 'avatar'])
     .then(post => res.json(post))
     .catch(err => res.status(404).json({ nopostfound: 'No post found with that ID' }));
 });
@@ -50,8 +50,6 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
   const newPost = new Post({
     text: req.body.text,
     title: req.body.title,
-    name: req.body.name,
-    avatar: req.body.avatar,
     user: req.user.id,
     likes: [],
     dislikes: [],
