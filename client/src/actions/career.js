@@ -40,7 +40,7 @@ export const getOffers = () => dispatch => {
     .catch(err =>
       dispatch({
         type: GET_OFFERS,
-        payload: err.response.data
+        payload: []
       })
     );
 };

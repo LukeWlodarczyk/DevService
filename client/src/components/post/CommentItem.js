@@ -17,24 +17,35 @@ class CommentItem extends Component {
   render() {
     const { comment, auth, postAuthor } = this.props;
 
+    const user = {
+      username: comment.user ? comment.user.username : 'deleted',
+      avatar: comment.user ? comment.user.avatar : 'http://www.gravatar.com/avatar/37d96b80617a8fe7f294ecd968da71d3?s=200&r=pg&d=mm',
+      name: comment.user ? comment.user.name : 'User deleted',
+      id: comment.user ? comment.user._id : 'deleted',
+    }
+
+    const author = {
+      id: postAuthor ? postAuthor._id : 'deleted',
+    }
+
     return (
       <div className={comment.best ? "card card-body sm-3 border-success mb-5" : "card card-body sm-3 mb-3"}>
         <div className="row">
           <div className="col-sm-2">
-            <Link to={'/profile/'+comment.user.username} className="btn btn-info">
+            <Link to={'/profile/'+user.username} className="btn btn-info">
               <img
                 className="rounded-circle d-none d-sm-block"
-                src={comment.user.avatar}
+                src={user.avatar}
               />
               <br />
-              <p className="text-center">{comment.user.name}</p>
+              <p className="text-center" style={{whiteSpace: 'pre-wrap'}}>{user.name}</p>
             </Link>
           </div>
-          <div className="col-sm-10">
+          <div className="col-sm-10 px-3 px-sm-5">
             <div className="text-left text-sm-right small">{new Date(comment.date).toLocaleDateString()}</div>
             <p className="lead">{comment.text}</p>
             <div className="text-center text-sm-left">
-              {comment.user._id === auth.user.id ? (
+              {user.id === auth.user.id ? (
                 <button
                   onClick={this.onDeleteClick}
                   type="button"
@@ -43,7 +54,7 @@ class CommentItem extends Component {
                   <i className="fas fa-times" />
                 </button>
               ) : null}
-              {postAuthor._id === auth.user.id ? (
+              {author.id === auth.user.id ? (
                 <button
                   onClick={this.onSetBestCommentClick}
                   type="button"

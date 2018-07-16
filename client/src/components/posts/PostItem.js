@@ -41,21 +41,29 @@ class PostItem extends Component {
   render() {
     const { post, auth, showActions, truncate } = this.props;
 
+
+  const user = {
+    username: post.user ? post.user.username : 'deleted',
+    avatar: post.user ? post.user.avatar : 'http://www.gravatar.com/avatar/37d96b80617a8fe7f294ecd968da71d3?s=200&r=pg&d=mm',
+    name: post.user ? post.user.name : 'User deleted',
+    id: post.user ? post.user._id : 'deleted',
+  }
+
     return (
       <div className="card card-body sm-3 mb-3">
         <div className="row">
           <div className="col-sm-2">
-            <Link to={'/profile/'+post.user.username} className="btn btn-info">
+            <Link to={'/profile/'+ user.username} className="btn btn-info">
               <img
                 className="rounded-circle d-none d-sm-block"
-                src={post.user.avatar}
+                src={user.avatar}
                 alt=""
               />
               <br />
-              <p className="text-center">{post.user.name}</p>
+              <p className="text-center" style={{whiteSpace: 'pre-wrap'}}>{user.name}</p>
             </Link>
           </div>
-          <div className="col-sm-10">
+          <div className="col-sm-10 px-3 px-sm-5">
             <h3>{post.title}</h3>
             <div className="small text-right">{new Date(post.date).toLocaleDateString()}</div>
             <p className={truncate ? "lead text-truncate" : "lead"}>{post.text}</p>
@@ -98,7 +106,7 @@ class PostItem extends Component {
               )
             }
             {
-              post.user._id === auth.user.id && (
+              user.id === auth.user.id && (
                 <PostButton
                   onClick={this.onDeleteClick}
                   postId={post._id}
