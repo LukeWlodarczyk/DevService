@@ -61,8 +61,7 @@ router.get('/:username', (req, res) => {
     .populate('user', ['name', 'avatar', 'username'])
     .then(profile => {
       if(!profile) {
-        errors.noprofile = 'There is no profile for this user';
-        return res.status(404).send(errors);
+        return res.status(404).json({ error: true, message: "This user doesn't exist" })
       }
       res.json(profile);
     })

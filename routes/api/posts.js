@@ -34,7 +34,7 @@ router.get('/:id', (req, res) => {
     .populate('user', ['id', 'username', 'name', 'avatar'])
     .populate('comments.user', ['username', 'name', 'avatar'])
     .then(post => res.json(post))
-    .catch(err => res.status(404).json({ nopostfound: 'No post found with that ID' }));
+    .catch(err => res.status(404).json({ error: true, message: "This post doesn't exist" }));
 });
 
 // @route   POST api/posts

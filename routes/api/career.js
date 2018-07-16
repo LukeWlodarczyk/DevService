@@ -15,6 +15,7 @@ router.get('/all', (req, res) => {
   const errors = {};
   JobOffer
     .find()
+    .sort({ date: -1 })
     .populate('user', ['name', 'avatar'])
     .then(offers => {
       if(!offers || offers.length === 0) {
@@ -34,7 +35,7 @@ router.get('/:id', (req, res) => {
     .findById(req.params.id)
     .populate('user', ['id', 'username'])
     .then(offer => res.json(offer))
-    .catch(err => res.status(404).json({ noofferfound: 'No offer found with that ID' }));
+    .catch(err => res.status(404).json({ error: true, message: "This offer doesn't exist" }));
 });
 
 // @route   POST api/career
