@@ -85,7 +85,7 @@ export default (state = initialState, action) => {
           ...state.post,
           comments: state.post.comments.map( comment => {
             if(comment._id === action.payload) {
-              comment.best = comment.best ? false : true;
+              comment.best = !comment.best
               return comment;
             }
             comment.best = false;

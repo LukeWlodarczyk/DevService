@@ -33,9 +33,7 @@ router.get('/:id', (req, res) => {
     .findById(req.params.id)
     .populate('user', ['id', 'username', 'name', 'avatar'])
     .populate('comments.user', ['username', 'name', 'avatar'])
-    .then(post => {
-      res.json(post)
-    })
+    .then(post => res.json(post))
     .catch(err => res.status(404).json({ nopostfound: 'No post found with that ID' }));
 });
 
@@ -56,10 +54,12 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
     user: req.user.id,
     likes: [],
     dislikes: [],
+    comments: [],
   });
 
   Post
     .create(newPost)
+    .then(post => Post.populate(post, { path: 'user' }))
     .then(post => res.json(post))
     .catch(err => res.json(err));
 });
@@ -163,6 +163,7 @@ router.post('/comment/:id', passport.authenticate('jwt', { session: false }), (r
 
         post
           .save()
+          .then(post => Post.populate(post, { path: 'comments.user' }))
           .then(post => res.json(post.comments[0]))
           .catch(err => res.json(err));
       })
@@ -205,7 +206,8 @@ router.post('/comment/best/:id/:comment_id', passport.authenticate('jwt', { sess
 
   Post
     .findById(req.params.id)
-    .populate('user', ['id'])
+    .populate('user', ['id','username', 'name', 'avatar'])
+    .populate('comments.user', ['id','username', 'name', 'avatar'])
     .then(post => {
       if( !post.comments.some(comment => comment._id.toString() === req.params.comment_id )) {
         return res.status(404).json({ commentnotexists: 'Comment does not exist' });
