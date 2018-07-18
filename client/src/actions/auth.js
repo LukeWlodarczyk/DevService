@@ -57,6 +57,41 @@ export const sendLinkToResetPassword = ({ email }, hostory) => dispatch => {
     );
 }
 
+
+export const checkURL = ({ id, token }) => dispatch => {
+
+  axios
+    .get(`/api/users/reset_password/${id}/${token}`)
+    .then(res => {
+      // TODO: check if valid token / id what to do if success / fail
+      // history.push('/login');
+
+    })
+    .catch(err =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data
+      })
+    );
+}
+
+export const resetPassword = ({ id, token, password, password2 }, history) => dispatch => {
+  dispatch(clearErrors);
+  axios
+    .post(`/api/users/reset_password/${id}/${token}`, { password, password2 })
+    .then(res => {
+
+      history.push('/login');
+
+    })
+    .catch(err =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data
+      })
+    );
+}
+
 export const setCurrentUser = decoded => {
 
   return {
