@@ -3,11 +3,16 @@ const router = express.Router();
 const gravatar = require('gravatar');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const jwtS= require('jwt-simple');
 const keys = require('../../config/keys');
 const passport = require('passport');
+const Mailer = require('../../services/Mailer');
+const resetTemplate = require('../../services/emailTemplates/resetEmail');
 
 const validateRegisterInput = require('../../validation/register');
 const validateLoginInput = require('../../validation/login');
+const validateEmailInput = require('../../validation/email');
+const validatePasswordInput = require('../../validation/password');
 
 const User = require('../../models/User');
 const Profile = require('../../models/Profile');
@@ -70,7 +75,7 @@ router.post('/register', (req, res) => {
 
                 res.json(user);
               })
-              .catch(err => res.json(err));
+              .catch(err => res.status(400).json(err));
           });
         });
       };
@@ -128,6 +133,136 @@ router.post('/login', (req, res) => {
           }
         })
     })
+})
+
+// @route   POST api/users/forgot_password
+// @desc    Send email with reset password link
+// @access  Public
+router.post('/forgot_password', (req, res) => {
+
+  const { errors, isValid } = validateEmailInput(req.body);
+
+  if(!isValid) {
+    return res.status(400).json(errors)
+  }
+
+  const email = req.body.email;
+
+  User
+    .findOne({ email })
+    .then(async user => {
+      if(!user) {
+        errors.email = 'No account with that email address exists';
+        return res.status(404).json(errors);
+      }
+
+      const secret = keys.secretOrKey + user.password + user.date.getTime();
+
+      const token = jwtS.encode({ id: user.id, expires: Date.now() + 1800000 }, secret)
+
+      const emailData = {
+        subject: 'Reset password - DevService',
+        recipients: [user.email]
+      }
+
+      try {
+        const mailer = new Mailer(emailData, resetTemplate({ id: user.id, token }));
+        await mailer.send();
+
+        res.send({ success: true });
+
+      } catch (e) {
+        errors.email = 'Sorry, something went wrong. Try agin later.';
+        return res.status(400).json(errors);
+      }
+
+
+    })
+    .catch(err => res.status(400).send(err));
+
+
+})
+
+// @route   GET api/users/reset_password/:id/:token
+// @desc    Check if token is valid
+// @access  Public
+router.get('/reset_password/:id/:token', (req, res) => {
+
+  User
+    .findById(req.params.id)
+    .then(user => {
+      if (!user) {
+        return res.status(404).json({ error: true, message: 'User does not exist ' })
+      }
+
+      const token = req.params.token;
+
+      const secret = keys.secretOrKey + user.password + user.date.getTime();
+
+      try {
+        const payload = jwtS.decode(token, secret);
+
+        if (payload.expires < Date.now()) {
+          return res.status(400).json({ error: true, message: 'Token expired' })
+        }
+
+        res.json({ success: true })
+
+      } catch (e) {
+        res.status(400).json({ error: true, message: 'Invalid token' })
+      }
+
+    })
+    .catch(err => res.status(404).json({ error: true, message: 'User does not exist' }));
+})
+
+// @route   GET api/users/reset_password/:id/:token
+// @desc    Set a new password
+// @access  Public
+router.post('/reset_password/:id/:token', (req, res) => {
+
+  const { errors, isValid } = validatePasswordInput(req.body);
+
+  if(!isValid) {
+    return res.status(400).json(errors)
+  }
+
+  User
+    .findById(req.params.id)
+    .then(user => {
+      if (!user) {
+        return res.status(404).json({ error: true, message: 'User does not exist ' })
+      }
+
+      console.log(user);
+
+      const token = req.params.token;
+
+      const secret = keys.secretOrKey + user.password + user.date.getTime();
+
+      try {
+        const payload = jwtS.decode(token, secret);
+
+        if (payload.expires < Date.now()) {
+          return res.status(400).json({ error: true, message: 'Token expired.' })
+        }
+
+        const newPassword = req.body.password;
+
+        bcrypt.hash(newPassword, 10, (err, hash) => {
+          if (err) return res.status(400).json(err);
+          user.password = hash;
+          user.save();
+        });
+
+        res.json({ success: true })
+
+      } catch (e) {
+        res.status(400).json({ error: true, message: 'Invalid token' })
+      }
+
+    })
+    .catch(err => res.status(404).json({ error: true, message: 'User does not exist' }));
 })
 
 // @route   GET api/users/current
