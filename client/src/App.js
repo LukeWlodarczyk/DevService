@@ -26,6 +26,8 @@ import Post from './components/post/Post';
 import AddOffer from './components/career/AddOffer';
 import Offer from './components/career/Offer';
 import Offers from './components/career/Offers';
+import ForgotPassword from './components/reset-password/ForgotPassword';
+import ResetPassword from './components/reset-password/ResetPassword';
 
 import './App.css';
 
@@ -51,7 +53,9 @@ class App extends Component {
             <Route exact path='/' component={Landing} />
             <div className="container">
               <Route path="/register" component={Register} />
-              <Route path="/login" component={Login} />
+              <Route exact path="/login" component={Login} />
+              <Route path="/login/forgot" component={ForgotPassword} />
+              <Route path="/login/reset_password/:id/:token" component={ResetPassword} />
               <Route path="/profiles" component={Profiles} />
               <Route path="/profile/:username" component={Profile} />
               <Switch>
