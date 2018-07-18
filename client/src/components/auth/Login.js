@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom'
 import { connect } from 'react-redux';
 import { loginUser } from '../../actions/auth';
 import { clearErrors } from '../../actions/profile';
@@ -77,6 +78,7 @@ class Login extends Component {
                   onChange={this.onChange}
                   error={errors.password}
                 />
+                <Link to="/login/forgot" className="small">Forgot password</Link>
                 <input onChange={this.onChange} type="submit" className="btn btn-info btn-block mt-4" />
               </form>
             </div>
