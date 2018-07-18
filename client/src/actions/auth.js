@@ -1,6 +1,7 @@
 import axios from 'axios';
 import setAuthToken from '../utils/setAuthToken';
 import jwt_decode from 'jwt-decode';
+import { clearErrors } from './profile';
 
 import { GET_ERRORS, SET_CURRENT_USER } from '../constants/action-types';
 
@@ -38,6 +39,23 @@ export const loginUser = userData => dispatch => {
       })
     );
 };
+
+export const sendLinkToResetPassword = ({ email }, hostory) => dispatch => {
+  dispatch(clearErrors);
+  axios
+    .post('/api/users/forgot_password', { email })
+    .then(res => {
+      // TODO: What to do after user type email succesfully and email is send?
+      // history.push('/email_sent')
+
+    })
+    .catch(err =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data
+      })
+    );
+}
 
 export const setCurrentUser = decoded => {
 
