@@ -214,6 +214,53 @@ router.get('/reset_password/:id/:token', (req, res) => {
     .catch(err => res.status(404).json({ error: true, message: 'User does not exist' }));
 })
 
+// @route   POST api/users/reset_password/:id/:token
+// @desc    Set a new password
+// @access  Public
+router.post('/reset_password/:id/:token', (req, res) => {
+
+  const { errors, isValid } = validatePasswordInput(req.body);
+
+  if(!isValid) {
+    return res.status(400).json(errors)
+  }
+
+  User
+    .findById(req.params.id)
+    .then(user => {
+      if (!user) {
+        return res.status(404).json({ error: true, message: 'User does not exist ' })
+      }
+
+      const token = req.params.token;
+
+      const secret = keys.secretOrKey + user.password + user.date.getTime();
+
+      try {
+        const payload = jwtS.decode(token, secret);
+
+        if (payload.expires < Date.now()) {
+          return res.status(400).json({ error: true, message: 'Token expired.' })
+        }
+
+        const newPassword = req.body.password;
+
+        bcrypt.hash(newPassword, 10, (err, hash) => {
+          if (err) return res.status(400).json(err);
+          user.password = hash;
+          user.save();
+        });
+
+        res.json({ success: true })
+
+      } catch (e) {
+        res.status(400).json({ error: true, message: 'Invalid token' })
+      }
+
+    })
+    .catch(err => res.status(404).json({ error: true, message: 'User does not exist' }));
+})
+
 // @route   GET api/users/current
 // @desc    Return current user
 // @access  Private
