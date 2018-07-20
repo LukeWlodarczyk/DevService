@@ -4,8 +4,11 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 
 const JobOffer = require('../../models/JobOffer');
+const Mailer = require('../../services/Mailer');
 
 const validateOfferInput = require('../../validation/jobOffer');
+const validateApplicationInput = require('../../validation/application');
+const applyTemplate = require('../../services/emailTemplates/applyForAJob');
 
 
 // @route   GET api/career/all
@@ -129,5 +132,37 @@ router.delete('/:id', passport.authenticate('jwt', { session: false }), (req, re
   }
 );
 
+// @route   POST api/carrer/apply
+// @desc    Send email to offer author
+// @access  Private
+router.post('/:id/apply', passport.authenticate('jwt', { session: false }), async (req, res) => {
+
+  const { errors, isValid } = validateApplicationInput(req.body);
+
+  if(!isValid) {
+    return res.status(400).json(errors)
+  }
+
+  const offer = await JobOffer.findById(req.params.id);
+
+  const emailData = {
+    subject: req.body.subject,
+    recipients: [offer.email],
+    from_email: req.body.email,
+  }
+
+  try {
+    const mailer = new Mailer(emailData, applyTemplate({ message: req.body.message }));
+    await mailer.send();
+
+    res.send({ success: true });
+
+  } catch (e) {
+    errors.email = 'Sorry, something went wrong. Try agin later.';
+    return res.status(400).json(errors);
+  }
+
+  }
+);
 
 module.exports = router;
