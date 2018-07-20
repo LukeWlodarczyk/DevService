@@ -6,7 +6,7 @@ const OfferHeading = ({ offer, auth, displayActions, deleteOffer }) => (
       <div className="row">
         <div className="col-md-12">
           <div className="card card-body bg-info text-white mb-3 position-relative">
-            {(displayActions && offer.user._id === auth.user.id) ? (
+            {(displayActions && offer.user ? offer.user._id : 'deleted' === auth.user.id) ? (
               <div className="position-absolute">
                 <button
                   onClick={deleteOffer}
