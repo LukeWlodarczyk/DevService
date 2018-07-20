@@ -28,8 +28,6 @@ class PostForm extends Component {
   onSubmit = (e) => {
     e.preventDefault();
 
-    const { user } = this.props.auth;
-
     const newPost = {
       title: this.state.title,
       text: this.state.text,
@@ -84,12 +82,10 @@ class PostForm extends Component {
 PostForm.propTypes = {
   addPost: PropTypes.func.isRequired,
   clearErrors: PropTypes.func.isRequired,
-  auth: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
-  auth: state.auth,
   errors: state.errors
 });
 

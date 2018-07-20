@@ -27,7 +27,6 @@ class CommentForm extends Component {
   onSubmit = (e) => {
     e.preventDefault();
 
-    const { user } = this.props.auth;
     const { postId } = this.props;
 
     const newComment = {
@@ -78,13 +77,11 @@ class CommentForm extends Component {
 CommentForm.propTypes = {
   addComment: PropTypes.func.isRequired,
   clearErrors: PropTypes.func.isRequired,
-  auth: PropTypes.object.isRequired,
   postId: PropTypes.string.isRequired,
   errors: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
-  auth: state.auth,
   errors: state.errors
 });
 
