@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import TextFieldGroup from '../common/TextFieldGroup';
 import { resetPassword, checkURL } from '../../actions/auth';
+import NotFound from '../not-found/NotFound'
 
 
 class ResetPassword extends Component {
@@ -41,6 +42,10 @@ class ResetPassword extends Component {
 
 	render() {
     const { password, password2, errors } = this.state;
+
+		if(errors.error) {
+			return <NotFound error={errors} />
+		}
 
 		return (
       <div className="forgotPassword">
