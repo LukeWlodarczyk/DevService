@@ -162,7 +162,8 @@ router.post('/forgot_password', (req, res) => {
 
       const emailData = {
         subject: 'Reset password - DevService',
-        recipients: [user.email]
+        recipients: [user.email],
+        from_email: 'no-reply@devservice.com'
       }
 
       try {
@@ -190,7 +191,7 @@ router.get('/reset_password/:id/:token', (req, res) => {
     .findById(req.params.id)
     .then(user => {
       if (!user) {
-        return res.status(404).json({ error: true, message: 'User does not exist ' })
+        return res.status(404).json({ error: true, message: 'Invalid URL (User ID not found in DB)' })
       }
 
       const token = req.params.token;
