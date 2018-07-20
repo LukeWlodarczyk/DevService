@@ -76,6 +76,12 @@ class ResetPassword extends Component {
 	}
 }
 
+ResetPassword.propTypes = {
+  checkURL: PropTypes.func.isRequired,
+	resetPassword: PropTypes.func.isRequired,
+  errors: PropTypes.object.isRequired
+};
+
 const mapStateToProps = ({ errors }) => ({ errors });
 
 export default connect(mapStateToProps, { resetPassword, checkURL })(ResetPassword);

@@ -58,6 +58,11 @@ class ForgotPassword extends Component {
 	}
 }
 
+ForgotPassword.propTypes = {
+  sendLinkToResetPassword: PropTypes.func.isRequired,
+  errors: PropTypes.object.isRequired
+};
+
 const mapStateToProps = ({ errors }) => ({ errors });
 
 export default connect(mapStateToProps, { sendLinkToResetPassword })(ForgotPassword);
