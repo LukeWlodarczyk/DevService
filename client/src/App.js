@@ -28,6 +28,7 @@ import Offer from './components/career/Offer';
 import Offers from './components/career/Offers';
 import ForgotPassword from './components/reset-password/ForgotPassword';
 import ResetPassword from './components/reset-password/ResetPassword';
+import Success from './components/common/Success';
 
 import './App.css';
 
@@ -58,6 +59,7 @@ class App extends Component {
               <Route path="/login/reset_password/:id/:token" component={ResetPassword} />
               <Route path="/profiles" component={Profiles} />
               <Route path="/profile/:username" component={Profile} />
+              <Route path="/success" component={Success} />
               <Switch>
                 <PrivateRoute path="/dashboard" component={Dashboard} />
                 <PrivateRoute path="/edit-profile" component={EditProfile} />

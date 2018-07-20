@@ -81,6 +81,25 @@ export const deleteOffer = (offerId, history) => dispatch => {
     );
 };
 
+export const sendApplication = ({ offerId, ...data }, history) => dispatch => {
+  axios
+    .post(`/api/career/${offerId}/apply`, data)
+    .then(() => {
+      history.push({
+             pathname:"/success",
+             state:{
+                 message: "Application send!"
+              },
+            });
+    })
+    .catch(err =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data
+      })
+    );
+};
+
 export const setOfferLoading = () => {
   return {
     type: OFFER_LOADING

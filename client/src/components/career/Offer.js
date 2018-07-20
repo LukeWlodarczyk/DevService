@@ -6,13 +6,12 @@ import NotFound from '../not-found/NotFound'
 import Spinner from '../common/Spinner';
 import OfferHeading from './OfferHeading';
 import OfferDetails from './OfferDetails';
+import OfferForm from './OfferForm';
 import { getOffer, deleteOffer } from '../../actions/career';
 
 class Offer extends Component {
   componentDidMount() {
-    if (this.props.match.params.id) {
-      this.props.getOffer(this.props.match.params.id);
-    }
+    this.props.getOffer(this.props.match.params.id);
   }
 
   deleteOffer = () => {
@@ -42,6 +41,7 @@ class Offer extends Component {
           </div>
           <OfferHeading offer={offer} auth={auth} deleteOffer={this.deleteOffer} displayActions={true} />
           <OfferDetails offer={offer} />
+          <OfferForm id={this.props.match.params.id} history={this.props.history} />
         </div>
       );
     }
