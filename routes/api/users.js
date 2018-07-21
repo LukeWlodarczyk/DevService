@@ -81,6 +81,19 @@ router.post('/register', async (req, res) => {
     newUserProfile.username = req.body.username;
     await newUserProfile.save();
 
+    const secret = keys.secretOrKey + user.id + user.date.getTime();
+
+    const token = jwtS.encode({ id: user.id }, secret);
+
+    const emailData = {
+      subject: 'Email Verification - DevService',
+      recipients: [user.email],
+      from_email: 'no-reply@devservice.com',
+    }
+
+    const mailer = new Mailer(emailData, verifyAccTemplate({ username: user.username, id: user.id, token }));
+    await mailer.send();
+
     res.json(user);
 
   } catch (err) {
