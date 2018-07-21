@@ -12,8 +12,8 @@ const app = express();
 
 // Body parser middleware
 app.use([
-  express.urlencoded({ extended: false }),
-  express.json()
+  express.urlencoded({ extended: false, limit: '10mb' }),
+  express.json({ limit: '10mb' })
 ]);
 
 // DB Config
