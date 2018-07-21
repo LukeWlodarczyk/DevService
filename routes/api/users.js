@@ -8,6 +8,7 @@ const keys = require('../../config/keys');
 const passport = require('passport');
 const Mailer = require('../../services/Mailer');
 const resetTemplate = require('../../services/emailTemplates/resetEmail');
+const verifyAccTemplate = require('../../services/emailTemplates/verifyEmail');
 
 const validateRegisterInput = require('../../validation/register');
 const validateLoginInput = require('../../validation/login');
@@ -26,60 +27,66 @@ router.get('/test', (req, res) => res.json({ msg: 'Users works' }));
 // @route   POST api/users/register
 // @desc    Register user
 // @access  Public
-router.post('/register', (req, res) => {
+router.post('/register', async (req, res) => {
 
   const { errors, isValid } = validateRegisterInput(req.body);
 
-  if(!isValid) {
+  if (!isValid) {
     return res.status(400).json(errors)
   }
 
-  User
-    .findOne({$or:[{email:{$regex: req.body.email, $options: 'i'}},
-                  {username:{$regex: req.body.username, $options: 'i'}}]
-    })
-    .then(user => {
-      if (user) {
-        user.email === req.body.email && (errors.email = 'Email already exists');
-        user.username === req.body.username && (errors.username = 'Username already exists');
-        return res.status(400).json(errors);
-      } else {
-        const avatar = gravatar.url(req.body.email, {
-          s: '200',
-          r: 'pg',
-          d: 'mm',
-        });
+  try {
+    const emailExist = await User.findOne({ email: req.body.email });
+    const usernameExist = await User.findOne({ username: req.body.username });
 
-        const newUser = new User({
-          name: req.body.name,
-          username: req.body.username,
-          email: req.body.email,
-          password: req.body.password,
-          avatar,
-        });
+    if (emailExist && usernameExist) {
+      errors.email = 'Email already exists';
+      errors.username = 'Username already exists';
+      return res.status(400).json(errors);
+    }
 
-        const newUserProfile = new Profile({});
+    if (emailExist) {
+      errors.email = 'Email already exists';
+      return res.status(400).json(errors);
+    }
 
-        bcrypt.genSalt(10, (err, salt) => {
-          bcrypt.hash(newUser.password, salt, (err, hash) => {
-            if (err) throw err;
-            newUser.password = hash;
-            newUser
-              .save()
-              .then(user => {
-                newUserProfile.user = user.id;
-                newUserProfile.username = req.body.username;
-                newUserProfile
-                  .save()
-                  .catch(err => res.json(err));
+    if (usernameExist) {
+      errors.username = 'Username already exists';
+      return res.status(400).json(errors);
+    }
 
-                res.json(user);
-              })
-              .catch(err => res.status(400).json(err));
-          });
-        });
-      };
+    const avatar = gravatar.url(req.body.email, {
+      s: '200',
+      r: 'pg',
+      d: 'mm',
     });
+
+    const newUser = new User({
+      name: req.body.name,
+      username: req.body.username,
+      email: req.body.email,
+      password: req.body.password,
+      avatar,
+    });
+
+    const newUserProfile = new Profile({});
+
+    const hash = await bcrypt.hash(newUser.password, 10);
+
+    newUser.password = hash;
+
+    const user = await newUser.save();
+
+    newUserProfile.user = user.id;
+    newUserProfile.username = req.body.username;
+    await newUserProfile.save();
+
+    res.json(user);
+
+  } catch (err) {
+    res.status(400).json(err)
+  };
+
 });
 
 // @route   POST api/users/login
