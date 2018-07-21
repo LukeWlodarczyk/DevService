@@ -2,11 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
+const showEditBtns = (user, authUser) => {
+  const userId = user ? user._id : 'deleted'
+  return userId === authUser.id
+}
+
 const OfferHeading = ({ offer, auth, displayActions, deleteOffer }) => (
       <div className="row">
         <div className="col-md-12">
           <div className="card card-body bg-info text-white mb-3 position-relative">
-            {(displayActions && offer.user ? offer.user._id : 'deleted' === auth.user.id) ? (
+            {displayActions && showEditBtns(offer.user, auth.user) && (
               <div className="position-absolute">
                 <button
                   onClick={deleteOffer}
@@ -22,7 +27,7 @@ const OfferHeading = ({ offer, auth, displayActions, deleteOffer }) => (
                   <i className="fas fa-pen-square" />
                 </Link>
               </div>
-            ) : null}
+            )}
             <div className="mx-5 text-center">
               <small>{new Date(offer.date).toLocaleDateString()}</small>
               <h1 className="lead text-center">

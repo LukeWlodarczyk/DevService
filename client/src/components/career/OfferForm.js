@@ -13,6 +13,7 @@ class OfferForm extends Component {
       message: '',
       subject: '',
       email: '',
+      attachment: null,
       errors: {}
     };
   }
@@ -26,9 +27,55 @@ class OfferForm extends Component {
   onSubmit = (e) => {
     e.preventDefault();
 
-    const { message, subject, email } = this.state;
+    const { message, subject, email, attachment } = this.state;
 
-    this.props.sendApplication({ message, subject, email, offerId: this.props.id }, this.props.history);
+    this.props.sendApplication({ message, subject, email, attachment, offerId: this.props.id }, this.props.history);
+
+  }
+
+  handleUploadFile = event => {
+    let selectedFile = event.target.files;
+    let file = null;
+    let fileName = "";
+
+    if (selectedFile.length > 0) {
+
+        if(!selectedFile[0].type.includes('pdf')) {
+          this.setState({
+            errors: {
+              ...this.state.errors,
+              file: 'Invalid image file type!'
+            }
+          })
+        }
+
+        if(selectedFile[0].size > 1536) {
+          this.setState({
+            errors: {
+              ...this.state.errors,
+              file: 'File is too big'
+            }
+          })
+        }
+
+        let fileToLoad = selectedFile[0];
+        fileName = fileToLoad.name;
+
+        let fileReader = new FileReader();
+
+        fileReader.onload = fileLoadedEvent => {
+            file = fileLoadedEvent.target.result;
+
+            const base64File = new Buffer(file).toString('base64');
+
+            this.setState({
+              attachment: { base64File, fileName },
+            })
+        };
+
+        fileReader.readAsArrayBuffer(fileToLoad);
+
+    }
 
   }
 
@@ -69,6 +116,7 @@ class OfferForm extends Component {
             error={errors.message}
           />
         </div>
+        <input onChange={this.handleUploadFile} type="file" name="upload" accept="application/pdf" />
         <button type="submit" className="btn btn-dark">
           Send application
         </button>
@@ -77,6 +125,6 @@ class OfferForm extends Component {
   }
 }
 
-const mapStateToProps = ({ errors, auth: { user }}) => ({ errors, user })
+const mapStateToProps = ({ errors }) => ({ errors })
 
 export default connect(mapStateToProps, { sendApplication })(OfferForm);

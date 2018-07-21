@@ -6,7 +6,7 @@ import {
 } from '../constants/action-types';
 
 const initialState = {
-  profile: {},
+  profile: null,
   profiles: [],
   loading: false
 };
