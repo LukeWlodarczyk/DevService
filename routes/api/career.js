@@ -151,6 +151,13 @@ router.post('/:id/apply', passport.authenticate('jwt', { session: false }), asyn
     from_email: req.body.email,
   }
 
+  if(req.body.attachment) {
+    emailData.attachment = {
+      base64File: req.body.attachment.base64File,
+      fileName: req.body.attachment.fileName,
+    }
+  }
+
   try {
     const mailer = new Mailer(emailData, applyTemplate({ message: req.body.message }));
     await mailer.send();
@@ -158,6 +165,7 @@ router.post('/:id/apply', passport.authenticate('jwt', { session: false }), asyn
     res.send({ success: true });
 
   } catch (e) {
+    console.log(e);
     errors.email = 'Sorry, something went wrong. Try agin later.';
     return res.status(400).json(errors);
   }
