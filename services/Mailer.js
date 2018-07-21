@@ -3,7 +3,7 @@ const helper = sendgrid.mail;
 const keys = require('../config/keys');
 
 class Mailer extends helper.Mail {
-	constructor({ subject, recipients, from_email }, content) {
+	constructor({ subject, recipients, from_email, attachment }, content) {
 		super();
 
 		this.sgApi = sendgrid(keys.sendGridKey);
@@ -11,9 +11,20 @@ class Mailer extends helper.Mail {
 		this.subject = subject;
 		this.body = new helper.Content('text/html', content);
     this.recipients = this.formatAddresses(recipients);
+		attachment && (this.attachment = this.prepareAttachment(attachment))
 
 		this.addContent(this.body);
     this.addRecipients();
+		attachment && this.addAttachment(this.attachment);
+	}
+
+	prepareAttachment({ base64File, fileName }) {
+		const attachment = new helper.Attachment();
+		attachment.setContent(base64File);
+		attachment.setType('application/pdf');
+		attachment.setFilename(`${fileName}.pdf`);
+		attachment.setDisposition('attachment');
+		return attachment;
 	}
 
   formatAddresses(recipients) {
