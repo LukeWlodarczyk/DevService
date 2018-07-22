@@ -1,6 +1,5 @@
-module.exports = {
-  mongoURI: process.env.MONGO_URI,
-  secretOrKey: process.env.SECRET_OR_KEY,
-  sendGridKey: process.env.SEND_GRID_KEY,
-  redirectDomain: process.env.REDIRECT_DOMAIN,
-};
+if (process.env.NODE_ENV === 'production') {
+	module.exports = require('./prod');
+} else {
+	module.exports = require('./dev');
+}
