@@ -3,6 +3,8 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const passport = require('passport');
 
+const requireEmailVerification = require('../../middlewares/requireEmailVerification');
+
 const JobOffer = require('../../models/JobOffer');
 const Mailer = require('../../services/Mailer');
 
@@ -44,7 +46,11 @@ router.get('/:id', (req, res) => {
 // @route   POST api/career
 // @desc    Add or edit job offer
 // @access  Private
-router.post('/', passport.authenticate('jwt', { session: false }), (req, res) => {
+router.post(
+        '/',
+        passport.authenticate('jwt', { session: false }),
+        requireEmailVerification,
+        (req, res) => {
 
   const { errors, isValid } = validateOfferInput(req.body);
 
@@ -135,7 +141,11 @@ router.delete('/:id', passport.authenticate('jwt', { session: false }), (req, re
 // @route   POST api/carrer/apply
 // @desc    Send email to offer author
 // @access  Private
-router.post('/:id/apply', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.post(
+        '/:id/apply',
+        passport.authenticate('jwt', { session: false }),
+        requireEmailVerification,
+        async (req, res) => {
 
   const { errors, isValid } = validateApplicationInput(req.body);
 
@@ -165,7 +175,6 @@ router.post('/:id/apply', passport.authenticate('jwt', { session: false }), asyn
     res.send({ success: true });
 
   } catch (e) {
-    console.log(e);
     errors.email = 'Sorry, something went wrong. Try agin later.';
     return res.status(400).json(errors);
   }
