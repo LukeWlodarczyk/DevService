@@ -1,4 +1,4 @@
-# FeedbackApp
+# DevService
 
 Site is published at https://dev-service.herokuapp.com
 
