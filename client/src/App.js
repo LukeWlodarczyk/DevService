@@ -15,6 +15,7 @@ import Footer from './components/layout/Footer';
 import Landing from './components/layout/Landing';
 import Register from './components/auth/Register';
 import Login from './components/auth/Login';
+import EmailVerification from './components/auth/EmailVerification';
 import Dashboard from './components/dashboard/Dashboard';
 import EditProfile from './components/edit-profile/EditProfile';
 import AddExperience from './components/add-credentials/AddExperience';
@@ -53,10 +54,11 @@ class App extends Component {
             <Navbar />
             <Route exact path='/' component={Landing} />
             <div className="container">
-              <Route path="/register" component={Register} />
+              <Route exact path="/register" component={Register} />
               <Route exact path="/login" component={Login} />
               <Route path="/login/forgot" component={ForgotPassword} />
               <Route path="/login/reset_password/:id/:token" component={ResetPassword} />
+              <Route path="/register/verify_email/:id/:token" component={EmailVerification} />
               <Route path="/profiles" component={Profiles} />
               <Route path="/profile/:username" component={Profile} />
               <Route path="/success" component={Success} />

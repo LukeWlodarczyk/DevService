@@ -84,9 +84,20 @@ export const resetPassword = ({ id, token, password, password2 }, history) => di
     .catch(err =>
       dispatch({
         type: GET_ERRORS,
-        payload: err.response.data
+        payload: err.response.data,
       })
     );
+}
+
+export const checkEmailVerUrl = ({ id, token }) => dispatch => {
+  axios
+    .get(`/api/users/register/verify_email/${id}/${token}`)
+    .catch(err => {
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data,
+      })
+    })
 }
 
 export const setCurrentUser = decoded => {
