@@ -33,8 +33,9 @@ class Dashboard extends Component {
           <div>
             <p className="lead text-muted">
               Welcome <Link to={`/profile/${profile.username}`}>{user.name}</Link>
+              {!user.isVerified && <small className='d-block text-warning'>Please, verify your email in order to have access to all DevService feature</small>}
             </p>
-            <ProfileActions />
+            <ProfileActions isVerified={user.isVerified} />
             <Experience experience={profile.experience} />
             <Education education={profile.education} />
             <div style={{ marginBottom: '60px' }} />
@@ -51,6 +52,7 @@ class Dashboard extends Component {
           <div>
             <p className="lead text-muted">Welcome {user.name}</p>
             <p>Your profile is almost empty, please add some info.</p>
+            {!user.isVerified && <span>Don{"'"}t forget to verify your email</span>}
             <Link to="/edit-profile" className="btn btn-lg btn-info">
               Add more details to your profile page
             </Link>

@@ -88,10 +88,13 @@ class OfferForm extends Component {
 
   render() {
     const { errors, message, subject, email } = this.state;
+    const { isVerified } = this.props;
 
     return (
-      <form noValidate onSubmit={this.onSubmit}>
-        <div className="form-group">
+      <form className='mt-3' noValidate onSubmit={this.onSubmit}>
+        <h3 className='text-center'>Apply for a job</h3>
+        {!isVerified && <div className='small text-center text-secondary'>(Only verified users can send job applications)</div>}
+        <div className="form-group  mt-3">
           <TextFieldGroup
             placeholder="Your email"
             name="email"
@@ -99,6 +102,7 @@ class OfferForm extends Component {
             value={email}
             onChange={this.handleChange}
             error={errors.email}
+            disabled={!isVerified}
           />
           <TextFieldGroup
             placeholder="Subject"
@@ -107,6 +111,7 @@ class OfferForm extends Component {
             value={subject}
             onChange={this.handleChange}
             error={errors.subject}
+            disabled={!isVerified}
           />
           <TextAreaFieldGroup
             placeholder="Some message"
@@ -114,10 +119,11 @@ class OfferForm extends Component {
             value={message}
             onChange={this.handleChange}
             error={errors.message}
+            disabled={!isVerified}
           />
         </div>
-        <input onChange={this.handleUploadFile} type="file" name="upload" accept="application/pdf" />
-        <button type="submit" className="btn btn-dark">
+        <input disabled={!isVerified} onChange={this.handleUploadFile} type="file" name="upload" accept="application/pdf" />
+        <button disabled={!isVerified} type="submit" className="btn btn-dark">
           Send application
         </button>
       </form>

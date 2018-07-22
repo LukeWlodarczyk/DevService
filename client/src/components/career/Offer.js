@@ -41,7 +41,7 @@ class Offer extends Component {
           </div>
           <OfferHeading offer={offer} auth={auth} deleteOffer={this.deleteOffer} displayActions={true} />
           <OfferDetails offer={offer} />
-          <OfferForm id={this.props.match.params.id} history={this.props.history} />
+          <OfferForm isVerified={auth.user.isVerified} id={this.props.match.params.id} history={this.props.history} />
         </div>
       );
     }

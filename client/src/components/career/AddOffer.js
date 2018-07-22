@@ -28,6 +28,10 @@ class AddOffer extends Component {
   }
 
   componentDidMount() {
+    if(!this.props.isVerified) {
+      this.props.history.push('/dashboard')
+    }
+
     if(Object.keys(this.props.errors).length !== 0) {
       this.props.clearErrors();
     }
@@ -219,7 +223,8 @@ AddOffer.propTypes = {
 
 const mapStateToProps = state => ({
   offer: state.career.offer,
-  errors: state.errors
+  errors: state.errors,
+  isVerified: state.auth.user.isVerified,
 });
 
 export default connect(mapStateToProps, { addOffer, getOffer, clearErrors })(AddOffer);
