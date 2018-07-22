@@ -23,10 +23,8 @@ class Dashboard extends Component {
 
     let dashboardContent;
 
-    if (profile === null || loading) {
+    if (profile === null || !profile.skills || loading) {
       dashboardContent = <Spinner />;
-    } else if(!profile.skills) {
-      this.props.history.push('/login');
     } else {
       if (profile.skills.length > 0) {
         dashboardContent = (

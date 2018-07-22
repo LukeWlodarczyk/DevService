@@ -36,7 +36,7 @@ class ProfileGithub extends Component {
 
     let repoItems;
 
-    if(repos.message = 'Not Found') {
+    if(repos.message === 'Not Found' || repos.length === 0) {
       repoItems = <p>There are no repositories...</p>
     } else {
       repoItems = repos.map(repo => (
