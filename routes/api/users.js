@@ -102,6 +102,41 @@ router.post('/register', async (req, res) => {
 
 });
 
+// @route   GET api/users/register/verify_email/:id/:token
+// @desc    Check if token and id in url is valid
+// @access  Public
+router.get('/register/verify_email/:id/:token', (req, res) => {
+
+  User
+    .findById(req.params.id)
+    .then(user => {
+      if(!user) {
+        res.status(404).json({ error: true, message: 'Invalid URL (User ID not found in DB)' });
+      }
+
+      const token = req.params.token;
+      const secret = keys.secretOrKey + user.id + user.date.getTime();
+
+      try {
+        const payload = jwtS.decode(token, secret);
+
+        user.isVerified = true;
+        user.save();
+
+        res.json({ success: true })
+
+      } catch (e) {
+         res.status(400).json({ error: true, message: 'Invalid token' })
+      };
+
+    })
+    .catch(err => {
+      if(err.kind === 'ObjectId') return res.status(404).json({ error: true, message: 'Invalid URL (User ID not found in DB)' });
+      res.status(400).json(err)
+    })
+
+});
+
 // @route   POST api/users/login
 // @desc    Login user / Returning JWT Token
 // @access  Public
@@ -134,6 +169,7 @@ router.post('/login', (req, res) => {
               name: user.name,
               username: user.username,
               avatar: user.avatar,
+              isVerified: user.isVerified,
             }
 
             jwt.sign(
