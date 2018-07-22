@@ -9,7 +9,8 @@ class ProfileGithub extends Component {
       clientId: process.env.REACT_APP_GITHUB_ID,
       clientSecret: process.env.REACT_APP_GITHUB_SECRET,
       count: 5,
-      sort: 'created: asc',
+      sort: 'updated',
+      direction: 'desc',
       repos: []
     };
     this.myRef = React.createRef();
@@ -17,9 +18,9 @@ class ProfileGithub extends Component {
 
   componentDidMount() {
     const { username } = this.props;
-    const { count, sort, clientId, clientSecret } = this.state;
+    const { count, sort, direction, clientId, clientSecret } = this.state;
     fetch(
-      `https://api.github.com/users/${username}/repos?per_page=${count}&sort=${sort}&client_id=${clientId}&client_secret=${clientSecret}`
+      `https://api.github.com/users/${username}/repos?per_page=${count}&sort=${sort}&direction=${direction}&client_id=${clientId}&client_secret=${clientSecret}`
     )
       .then(res => res.json())
       .then(data => {
