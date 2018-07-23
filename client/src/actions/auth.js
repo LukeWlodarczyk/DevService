@@ -61,7 +61,25 @@ export const sendLinkToResetPassword = ({ email }, history) => dispatch => {
     );
 }
 
-
+export const sendEmailVerifcaion = ({ id }, history) => dispatch => {
+  dispatch(clearErrors);
+  axios
+    .post(`register/send_email_verification/${id}`)
+    .then(() => {
+      history.push({
+             pathname:"/success",
+             state:{
+                 message: `Check out your email in order to complete verifing email.`
+              },
+            });
+    })
+    .catch(err =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data
+      })
+    );
+}
 export const checkURL = ({ id, token }) => dispatch => {
 
   axios
