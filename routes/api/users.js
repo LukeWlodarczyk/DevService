@@ -94,13 +94,40 @@ router.post('/register', async (req, res) => {
     const mailer = new Mailer(emailData, verifyAccTemplate({ username: user.username, id: user.id, token }));
     await mailer.send();
 
-    res.json(user);
+    res.json({ success: true });
 
   } catch (err) {
     res.status(400).json(err)
   };
 
 });
+
+// @route   POST api/users/register/send_email_verification/:id
+// @desc    Send email verification
+// @access  Private
+route.post('/register/send_email_verification/:id', passport.authenticate('jwt', { session: false }), async (req, res) => {
+
+    try {
+      const user = await User.findById(req.params.id);
+
+      const secret = keys.secretOrKey + user.id + user.date.getTime();
+
+      const token = jwtS.encode({ id: user.id }, secret);
+
+      const emailData = {
+        subject: 'Email Verification - DevService',
+        recipients: [user.email],
+        from_email: 'no-reply@devservice.com',
+      }
+
+      const mailer = new Mailer(emailData, verifyAccTemplate({ username: user.username, id: user.id, token }));
+      await mailer.send();
+
+      res.json({ success: true });
+    } catch (e) {
+      res.status(400).json(err)
+    }
+})
 
 // @route   GET api/users/register/verify_email/:id/:token
 // @desc    Check if token and id in url is valid
