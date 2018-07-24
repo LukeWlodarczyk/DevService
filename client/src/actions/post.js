@@ -68,15 +68,16 @@ export const getPost = id => dispatch => {
 		);
 };
 
-export const deletePost = id => dispatch => {
+export const deletePost = (id, history) => dispatch => {
 	axios
 		.delete(`/api/posts/${id}`)
-		.then(res =>
+		.then(res => {
 			dispatch({
 				type: DELETE_POST,
 				payload: id,
-			})
-		)
+			});
+			history.push('/feed');
+		})
 		.catch(err =>
 			dispatch({
 				type: GET_ERRORS,
