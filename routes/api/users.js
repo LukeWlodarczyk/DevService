@@ -201,47 +201,51 @@ router.post('/login', async (req, res) => {
   const email_or_username = req.body.email_or_username;
   const password = req.body.password;
 
-  const email = await User.findOne({ email: email_or_username });
-  const username = await User.findOne({ username: email_or_username });
+  try {
+    const email = await User.findOne({ email: email_or_username });
+    const username = await User.findOne({ username: email_or_username });
 
-  const user = username || email;
+    const user = username || email;
 
-  if (!user) {
-    errors.email_or_username = 'User not found';
-    return res.status(404).json(errors);
-  };
+    if (!user) {
+      errors.email_or_username = 'User not found';
+      return res.status(404).json(errors);
+    };
 
-  const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
 
-  if (!isMatch) {
-    errors.password = 'Password incorrect';
-    return res.status(404).json(errors)
+    if (!isMatch) {
+      errors.password = 'Password incorrect';
+      return res.status(404).json(errors)
+    }
+
+    const payload = {
+      id: user.id,
+      name: user.name,
+      username: user.username,
+      avatar: user.avatar,
+      isVerified: user.isVerified,
+    }
+
+    const token = jwt.sign(
+      payload,
+      keys.secretOrKey,
+      { expiresIn: 30 * 24 * 60 * 60 * 1000 }
+    )
+
+    res.json({
+      success: true,
+      token: 'Bearer ' + token,
+    });
+  } catch (err) {
+    res.status(400).json(err);
   }
-
-  const payload = {
-    id: user.id,
-    name: user.name,
-    username: user.username,
-    avatar: user.avatar,
-    isVerified: user.isVerified,
-  }
-
-  const token = jwt.sign(
-    payload,
-    keys.secretOrKey,
-    { expiresIn: 30 * 24 * 60 * 60 * 1000 }
-  )
-
-  res.json({
-    success: true,
-    token: 'Bearer ' + token,
-  });
 })
 
 // @route   POST api/users/forgot_password
 // @desc    Send email with reset password link
 // @access  Public
-router.post('/forgot_password', (req, res) => {
+router.post('/forgot_password', async (req, res) => {
 
   const { errors, isValid } = validateEmailInput(req.body);
 
@@ -251,118 +255,109 @@ router.post('/forgot_password', (req, res) => {
 
   const email = req.body.email;
 
-  User
-    .findOne({ email })
-    .then(async user => {
-      if(!user) {
-        errors.email = 'No account with that email address exists';
-        return res.status(404).json(errors);
-      }
+  try {
+    const user = await User.findOne({ email });
 
-      const secret = keys.secretOrKey + user.password + user.date.getTime();
+    if(!user) {
+      errors.email = 'No account with that email address exists';
+      return res.status(404).json(errors);
+    }
 
-      const token = jwtS.encode({ id: user.id, expires: Date.now() + 1800000 }, secret)
+    const secret = keys.secretOrKey + user.password + user.date.getTime();
 
-      const emailData = {
-        subject: 'Reset password - DevService',
-        recipients: [user.email],
-        from_email: 'no-reply@devservice.com'
-      }
+    const token = jwt.sign({ id: user.id, expires: Date.now() + 3600000 }, secret)
 
-      try {
-        const mailer = new Mailer(emailData, resetTemplate({ id: user.id, token }));
-        await mailer.send();
+    const emailData = {
+      subject: 'Reset password - DevService',
+      recipients: [user.email],
+      from_email: 'no-reply@devservice.com'
+    };
 
-        res.send({ success: true });
+    const mailer = new Mailer(emailData, resetTemplate({ id: user.id, token }));
+    await mailer.send();
 
-      } catch (e) {
-        errors.email = 'Sorry, something went wrong. Try agin later.';
-        return res.status(400).json(errors);
-      }
+    res.send({ success: true });
 
-
-    })
-    .catch(err => res.status(400).send(err));
+  } catch (err) {
+    return res.status(400).json(err);
+  }
 })
 
 // @route   GET api/users/reset_password/:id/:token
 // @desc    Check if token is valid
 // @access  Public
-router.get('/reset_password/:id/:token', (req, res) => {
+router.get('/reset_password/:id/:token', async (req, res) => {
 
-  User
-    .findById(req.params.id)
-    .then(user => {
-      if (!user) {
-        return res.status(404).json({ error: true, message: 'Invalid URL (User ID not found in DB)' })
-      }
+  try {
+    const user = await User.findById(req.params.id);
 
-      const token = req.params.token;
+    if (!user) {
+      return res.status(404).json({ error: true, message: 'Invalid URL (User ID not found in DB)' })
+    }
 
-      const secret = keys.secretOrKey + user.password + user.date.getTime();
+    const token = req.params.token;
+    const secret = keys.secretOrKey + user.password + user.date.getTime();
 
-      try {
-        const payload = jwtS.decode(token, secret);
+    const payload = jwt.verify(token, secret);
 
-        if (payload.expires < Date.now()) {
-          return res.status(400).json({ error: true, message: 'Token expired' })
-        }
+    if (payload.expires < Date.now()) {
+      return res.status(400).json({ error: true, message: 'Token expired' })
+    }
 
-        res.json({ success: true })
+    res.json({ success: true });
 
-      } catch (e) {
-        res.status(400).json({ error: true, message: 'Invalid token' })
-      }
-
-    })
-    .catch(err => res.status(404).json({ error: true, message: 'User does not exist' }));
+  } catch (err) {
+    if(err.kind === 'ObjectId') {
+      return res.status(404).json({ error: true, message: 'Invalid URL (User ID not found in DB)' });
+    }
+    if(err.name === 'JsonWebTokenError') {
+      return res.status(400).json({ error: true, message: 'Invalid URL (Token not verified)'});
+    }
+    res.status(400).json(err)
+  }
 })
 
 // @route   POST api/users/reset_password/:id/:token
 // @desc    Set a new password
 // @access  Public
-router.post('/reset_password/:id/:token', (req, res) => {
+router.post('/reset_password/:id/:token', async (req, res) => {
 
   const { errors, isValid } = validatePasswordInput(req.body);
 
   if(!isValid) {
-    return res.status(400).json(errors)
+    return res.status(400).json(errors);
+  };
+
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ error: true, message: 'User does not exist ' })
+    };
+
+    const token = req.params.token;
+    const secret = keys.secretOrKey + user.password + user.date.getTime();
+
+    const payload = jwt.verify(token, secret);
+
+    if (payload.expires < Date.now()) {
+      return res.status(400).json({ error: true, message: 'Token expired.' });
+    }
+
+    const hash = await bcrypt.hash(req.body.password, 10);
+    user.password = hash;
+    await user.save();
+
+    res.json({ success: true });
+  } catch (err) {
+    if(err.kind === 'ObjectId') {
+      return res.status(404).json({ error: true, message: 'Invalid URL (User ID not found in DB)' });
+    }
+    if(err.name === 'JsonWebTokenError') {
+      return res.status(400).json({ error: true, message: 'Invalid URL (Token not verified)'});
+    }
+    res.status(400).json(err)
   }
-
-  User
-    .findById(req.params.id)
-    .then(user => {
-      if (!user) {
-        return res.status(404).json({ error: true, message: 'User does not exist ' })
-      }
-
-      const token = req.params.token;
-
-      const secret = keys.secretOrKey + user.password + user.date.getTime();
-
-      try {
-        const payload = jwtS.decode(token, secret);
-
-        if (payload.expires < Date.now()) {
-          return res.status(400).json({ error: true, message: 'Token expired.' })
-        }
-
-        const newPassword = req.body.password;
-
-        bcrypt.hash(newPassword, 10, (err, hash) => {
-          if (err) return res.status(400).json(err);
-          user.password = hash;
-          user.save();
-        });
-
-        res.json({ success: true })
-
-      } catch (e) {
-        res.status(400).json({ error: true, message: 'Invalid token' })
-      }
-
-    })
-    .catch(err => res.status(404).json({ error: true, message: 'User does not exist' }));
 })
 
 // @route   GET api/users/current
