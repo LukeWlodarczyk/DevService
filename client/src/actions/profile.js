@@ -19,12 +19,9 @@ export const getCurrentProfile = () => dispatch => {
 				payload: res.data,
 			})
 		)
-		.catch(err =>
-			dispatch({
-				type: GET_PROFILE,
-				payload: {},
-			})
-		);
+		.catch(err => {
+			dispatch(logoutUser());
+		});
 };
 
 export const getProfileByUsername = username => dispatch => {
