@@ -190,7 +190,7 @@ router.get('/register/verify_email/:id/:token', async (req, res) => {
 // @route   POST api/users/login
 // @desc    Login user / Returning JWT Token
 // @access  Public
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
 
   const { errors, isValid } = validateLoginInput(req.body);
 
@@ -201,44 +201,41 @@ router.post('/login', (req, res) => {
   const email_or_username = req.body.email_or_username;
   const password = req.body.password;
 
-  User
-    .findOne({$or:[{email:{$regex: email_or_username, $options: 'i'}},
-                  {username:{$regex: email_or_username, $options: 'i'}}]
-    })
-    .then(user => {
-      if (!user) {
-        errors.email_or_username = 'User not found';
-        return res.status(404).json(errors);
-      };
-      bcrypt.compare(password, user.password)
-        .then(isMatch => {
-          if (isMatch) {
+  const email = await User.findOne({ email: email_or_username });
+  const username = await User.findOne({ username: email_or_username });
 
-            const payload = {
-              id: user.id,
-              name: user.name,
-              username: user.username,
-              avatar: user.avatar,
-              isVerified: user.isVerified,
-            }
+  const user = username || email;
 
-            jwt.sign(
-              payload,
-              keys.secretOrKey,
-              { expiresIn: 30 * 24 * 60 * 60 * 1000 },
-              (err, token) => {
-                res.json({
-                  success: true,
-                  token: 'Bearer ' + token,
-                })
-              }
-            )
-          } else {
-            errors.password = 'Password incorrect';
-            return res.status(404).json(errors)
-          }
-        })
-    })
+  if (!user) {
+    errors.email_or_username = 'User not found';
+    return res.status(404).json(errors);
+  };
+
+  const isMatch = await bcrypt.compare(password, user.password);
+
+  if (!isMatch) {
+    errors.password = 'Password incorrect';
+    return res.status(404).json(errors)
+  }
+
+  const payload = {
+    id: user.id,
+    name: user.name,
+    username: user.username,
+    avatar: user.avatar,
+    isVerified: user.isVerified,
+  }
+
+  const token = jwt.sign(
+    payload,
+    keys.secretOrKey,
+    { expiresIn: 30 * 24 * 60 * 60 * 1000 }
+  )
+
+  res.json({
+    success: true,
+    token: 'Bearer ' + token,
+  });
 })
 
 // @route   POST api/users/forgot_password
