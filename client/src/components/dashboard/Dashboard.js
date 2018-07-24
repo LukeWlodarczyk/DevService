@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { getCurrentProfile, deleteAccount } from '../../actions/profile';
+import { sendEmailVerification } from '../../actions/auth';
 import Spinner from '../common/Spinner';
 import ProfileActions from './ProfileActions';
 import Experience from './Experience';
@@ -15,6 +16,11 @@ class Dashboard extends Component {
 
   onDeleteClick = (e) => {
     this.props.deleteAccount();
+  }
+
+  handleSendEmailVerification = () => {
+    const { id } = this.props.auth.user;
+    this.props.sendEmailVerification({ id }, this.props.history);
   }
 
   render() {
@@ -31,7 +37,12 @@ class Dashboard extends Component {
           <div>
             <p className="lead text-muted">
               Welcome <Link to={`/profile/${profile.username}`}>{user.name}</Link>
-              {!user.isVerified && <small className='d-block text-warning'>Please, verify your email in order to have access to all DevService feature</small>}
+              {!user.isVerified && (
+                <span>
+                  <small className='d-block text-warning'>Please, verify your email in order to have access to all DevService feature.
+                  </small>
+                  <button type='button' className='btn btn-primary btn-sm' onClick={this.handleSendEmailVerification}>Send email again</button>
+                </span>)}
             </p>
             <ProfileActions isVerified={user.isVerified} />
             <Experience experience={profile.experience} />
@@ -50,7 +61,7 @@ class Dashboard extends Component {
           <div>
             <p className="lead text-muted">Welcome {user.name}</p>
             <p>Your profile is almost empty, please add some info.</p>
-            {!user.isVerified && <span>Don{"'"}t forget to verify your email</span>}
+            {!user.isVerified && <p className='text-warning'>Don{"'"}t forget to verify your email.</p>}
             <Link to="/edit-profile" className="btn btn-lg btn-info">
               Add more details to your profile page
             </Link>
@@ -86,4 +97,4 @@ const mapStateToProps = state => ({
   auth: state.auth
 });
 
-export default connect(mapStateToProps, { getCurrentProfile, deleteAccount })(Dashboard);
+export default connect(mapStateToProps, { getCurrentProfile, deleteAccount, sendEmailVerification })(Dashboard);
