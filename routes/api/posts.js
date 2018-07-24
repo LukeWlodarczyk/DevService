@@ -15,224 +15,373 @@ router.get('/test', (req, res) => res.json({ msg: 'Posts works' }));
 
 // @route   GET api/posts
 // @desc    Get posts
-// @access  Public
-router.get('/', (req, res) => {
-  Post
-    .find()
-    .sort({ date: -1 })
-    .populate('user', ['id', 'username', 'name', 'avatar'])
-    .then(posts => res.json(posts))
-    .catch(err => res.status(404).json({ nopostsfound: 'No posts found' }));
-});
+// @access  Private
+router.get(
+	'/',
+	passport.authenticate('jwt', { session: false }),
+	async (req, res) => {
+		try {
+			const posts = await Post.find()
+				.sort({ date: -1 })
+				.populate('user', ['id', 'username', 'name', 'avatar']);
+
+			if (!posts || posts.length === 0) {
+				return res
+					.status(404)
+					.json({ error: true, message: 'There are no posts' });
+			}
+
+			res.json(posts);
+		} catch (err) {
+			res.status(400).json(err);
+		}
+	}
+);
 
 // @route   GET api/posts/:id
 // @desc    Get post by id
-// @access  Public
-router.get('/:id', (req, res) => {
-  Post
-    .findById(req.params.id)
-    .populate('user', ['id', 'username', 'name', 'avatar'])
-    .populate('comments.user', ['username', 'name', 'avatar'])
-    .then(post => res.json(post))
-    .catch(err => res.status(404).json({ error: true, message: "This post doesn't exist" }));
-});
+// @access  Private
+router.get(
+	'/:id',
+	passport.authenticate('jwt', { session: false }),
+	async (req, res) => {
+		try {
+			const post = await Post.findById(req.params.id)
+				.populate('user', ['id', 'username', 'name', 'avatar'])
+				.populate('comments.user', ['username', 'name', 'avatar']);
+
+			if (!post) {
+				return res.status(404).json({
+					error: true,
+					message: 'Post with that ID does not exist',
+				});
+			}
+
+			res.json(post);
+		} catch (err) {
+			if (err.kind === 'ObjectId') {
+				return res.status(404).json({
+					error: true,
+					message: 'Post with that ID does not exist',
+				});
+			}
+			res.status(400).json(err);
+		}
+	}
+);
 
 // @route   POST api/posts
 // @desc    Create post
 // @access  Private
-router.post('/', passport.authenticate('jwt', { session: false }), (req, res) => {
+router.post(
+	'/',
+	passport.authenticate('jwt', { session: false }),
+	async (req, res) => {
+		const { errors, isValid } = validatePostInput(req.body);
 
-  const { errors, isValid } = validatePostInput(req.body);
+		if (!isValid) {
+			return res.status(400).json(errors);
+		}
 
-  if(!isValid) {
-    return res.status(400).json(errors);
-  }
+		const post = new Post({
+			text: req.body.text,
+			title: req.body.title,
+			user: req.user.id,
+			likes: [],
+			dislikes: [],
+			comments: [],
+		});
 
-  const newPost = new Post({
-    text: req.body.text,
-    title: req.body.title,
-    user: req.user.id,
-    likes: [],
-    dislikes: [],
-    comments: [],
-  });
-
-  Post
-    .create(newPost)
-    .then(post => Post.populate(post, { path: 'user' }))
-    .then(post => res.json(post))
-    .catch(err => res.json(err));
-});
+		try {
+			const newPost = await Post.create(paost);
+			const populatedPost = await Post.populate(newPost, {
+				path: 'user',
+				select: ['id', 'username', 'name', 'avatar'],
+			});
+			res.json(populatedPost);
+		} catch (err) {
+			res.status(400).json(err);
+		}
+	}
+);
 
 // @route   DELETE api/posts/:id
 // @desc    Delete post
 // @access  Private
-router.delete('/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
-  Post
-    .findById(req.params.id)
-    .then(post => {
-      if(post.user.toString() !== req.user.id) {
-        return res.status(401).json({ notauthorized: 'User not authorized' });
-      }
-      post
-        .remove()
-        .then(() => res.json({ success: true }))
-        .catch(err => res.json(err));
-    })
-    .catch(err => res.status(404).json({ postnotfound: 'No post found' }));
-});
+router.delete(
+	'/:id',
+	passport.authenticate('jwt', { session: false }),
+	async (req, res) => {
+		try {
+			const post = await Post.findById(req.params.id);
 
-// @route   POST api/posts/like/:id
-// @desc    Like post
-// @access  Private
-router.post('/like/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
-  Post
-    .findById(req.params.id)
-    .then(post => {
-      if( post.likes.some(like => like.user.toString() === req.user.id) ) {
-        post.likes = post.likes.filter(item => item.user.toString() !== req.user.id);
-        return post
-                .save()
-                .then(post => res.json(post))
-                .catch(err => res.json(err));
-      }
+			if (!post) {
+				return res
+					.status(404)
+					.json({ error: true, message: 'Post with that ID does not exist' });
+			}
 
-      if( post.dislikes.some(like => like.user.toString() === req.user.id) ) {
-        post.dislikes = post.dislikes.filter(item => item.user.toString() !== req.user.id)
-      }
-
-      post.likes.unshift({ user: req.user.id });
-
-      post
-        .save()
-        .then(post => res.json(post))
-        .catch(err => res.json(err));
-    })
-    .catch(err => res.status(404).json({ postnotfound: 'No post found' }));
-});
-
-// @route   POST api/posts/unlike/:id
-// @desc    Dislike post
-// @access  Private
-router.post('/dislike/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
-  Post
-    .findById(req.params.id)
-    .then(post => {
-      if( post.dislikes.some(like => like.user.toString() === req.user.id) ) {
-        post.dislikes = post.dislikes.filter(item => item.user.toString() !== req.user.id);
-        return post
-                .save()
-                .then(post => res.json(post))
-                .catch(err => res.json(err));
-      }
-
-      if( post.likes.some(like => like.user.toString() === req.user.id) ) {
-        post.likes = post.likes.filter(item => item.user.toString() !== req.user.id)
-      }
-
-      post.dislikes.unshift({ user: req.user.id });
-
-      post
-        .save()
-        .then(post => res.json(post))
-        .catch(err => res.json(err));
-    })
-    .catch(err => res.status(404).json({ postnotfound: 'No post found' }));
-  }
+			if (post.user.toString() !== req.user.id) {
+				return res.status(401).json({
+					error: true,
+					message: 'User not authorized. This post belongs to different user.',
+				});
+			}
+			await post.remove();
+			res.json({ success: true });
+		} catch (err) {
+			if (err.kind === 'ObjectId') {
+				return res.status(404).json({
+					error: true,
+					message: 'Post with that ID does not exist',
+				});
+			}
+			res.status(400).json(err);
+		}
+	}
 );
 
-// @route   POST api/posts/comment/:id
+// @route   PUT api/posts/like/:id
+// @desc    Like post
+// @access  Private
+router.put(
+	'/like/:id',
+	passport.authenticate('jwt', { session: false }),
+	async (req, res) => {
+		try {
+			const post = await Post.findById(req.params.id);
+
+			if (!post) {
+				return res
+					.status(404)
+					.json({ error: true, message: 'Post with that ID does not exist' });
+			}
+
+			if (post.likes.some(like => like.user.toString() === req.user.id)) {
+				post.likes = post.likes.filter(
+					item => item.user.toString() !== req.user.id
+				);
+				await post.save();
+				return res.json(post);
+			}
+
+			if (post.dislikes.some(like => like.user.toString() === req.user.id)) {
+				post.dislikes = post.dislikes.filter(
+					item => item.user.toString() !== req.user.id
+				);
+			}
+
+			post.likes.unshift({ user: req.user.id });
+
+			await post.save();
+			res.json(post);
+		} catch (err) {
+			if (err.kind === 'ObjectId') {
+				return res.status(404).json({
+					error: true,
+					message: 'Post with that ID does not exist',
+				});
+			}
+			res.status(400).json(err);
+		}
+	}
+);
+
+// @route   PUT api/posts/unlike/:id
+// @desc    Dislike post
+// @access  Private
+router.put(
+	'/dislike/:id',
+	passport.authenticate('jwt', { session: false }),
+	async (req, res) => {
+		try {
+			const post = await Post.findById(req.params.id);
+
+			if (!post) {
+				return res
+					.status(404)
+					.json({ error: true, message: 'Post with that ID does not exist' });
+			}
+
+			if (post.dislikes.some(like => like.user.toString() === req.user.id)) {
+				post.dislikes = post.dislikes.filter(
+					item => item.user.toString() !== req.user.id
+				);
+				await post.save();
+				return res.json(post);
+			}
+
+			if (post.likes.some(like => like.user.toString() === req.user.id)) {
+				post.likes = post.likes.filter(
+					item => item.user.toString() !== req.user.id
+				);
+			}
+
+			post.dislikes.unshift({ user: req.user.id });
+
+			await post.save();
+			res.json(post);
+		} catch (err) {
+			if (err.kind === 'ObjectId') {
+				return res.status(404).json({
+					error: true,
+					message: 'Post with that ID does not exist',
+				});
+			}
+			res.status(400).json(err);
+		}
+	}
+);
+
+// @route   POST api/posts/:id/comment
 // @desc    Add comment to post
 // @access  Private
-router.post('/comment/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
-    const { errors, isValid } = validateCommentInput(req.body);
+router.post(
+	'/:id/comment',
+	passport.authenticate('jwt', { session: false }),
+	async (req, res) => {
+		const { errors, isValid } = validateCommentInput(req.body);
 
-    if(!isValid) {
-      return res.status(400).json(errors);
-    };
+		if (!isValid) {
+			return res.status(400).json(errors);
+		}
 
-    Post
-      .findById(req.params.id)
-      .then(post => {
-        const newComment = {
-          text: req.body.text,
-          user: req.user.id
-        };
+		const newComment = {
+			text: req.body.text,
+			user: req.user.id,
+		};
 
-        post.comments.unshift(newComment);
+		try {
+			const post = await Post.findByIdAndUpdate(
+				req.params.id,
+				{
+					$push: {
+						comments: { $each: [newComment], $position: 0 },
+					},
+				},
+				{ new: true }
+			);
 
-        post
-          .save()
-          .then(post => Post.populate(post, { path: 'comments.user' }))
-          .then(post => res.json(post.comments[0]))
-          .catch(err => res.json(err));
-      })
-      .catch(err => res.status(404).json({ postnotfound: 'No post found' }));
-  }
+			const populatedPost = await Post.populate(post, {
+				path: 'comments.user',
+				select: ['id', 'username', 'name', 'avatar'],
+			});
+			res.json(populatedPost.comments[0]);
+		} catch (err) {
+			if (err.kind === 'ObjectId') {
+				return res.status(404).json({
+					error: true,
+					message: 'Post with that ID does not exist',
+				});
+			}
+			res.status(400).json(err);
+		}
+	}
 );
 
 // @route   DELETE api/posts/comment/:id/:comment_id
 // @desc    Remove comment from post
 // @access  Private
-router.delete('/comment/:id/:comment_id', passport.authenticate('jwt', { session: false }), (req, res) => {
-    Post
-      .findById(req.params.id)
-      .then(post => {
-        if( !post.comments.some(comment => comment._id.toString() === req.params.comment_id )) {
-          return res.status(404).json({ commentnotexists: 'Comment does not exist' });
-        };
+router.delete(
+	'/:id/comment/:comment_id',
+	passport.authenticate('jwt', { session: false }),
+	async (req, res) => {
+		try {
+			const post = await Post.findById(req.params.id);
 
-        const removeIndex = post.comments.findIndex(item => item._id.toString() === req.params.comment_id)
+			if (!post) {
+			}
 
-        if(req.user.id !== post.comments[removeIndex].user.toString()) {
-           return res.status(401).json({ notauthorized: "User not authorized" });
-        };
+			if (
+				!post.comments.some(
+					comment => comment._id.toString() === req.params.comment_id
+				)
+			) {
+				return res.status(404).json({
+					error: true,
+					message: 'Comment with that ID does not exist',
+				});
+			}
 
-        post.comments.splice(removeIndex, 1);
+			const removeIndex = post.comments.findIndex(
+				item => item._id.toString() === req.params.comment_id
+			);
 
-        post
-          .save()
-          .then(post => res.json(post))
-          .catch(err => res.json(err));
-      })
-      .catch(err => res.status(404).json({ postnotfound: 'No post found' }));
-  }
+			if (req.user.id !== post.comments[removeIndex].user.toString()) {
+				return res.status(401).json({
+					error: true,
+					message:
+						'User not authorized. This comment belongs to different user.',
+				});
+			}
+
+			post.comments.splice(removeIndex, 1);
+
+			await post.save();
+			res.json(post);
+		} catch (err) {
+			if (err.kind === 'ObjectId') {
+				return res.status(404).json({
+					error: true,
+					message: 'Post with that ID does not exist',
+				});
+			}
+			res.status(400).json(err);
+		}
+	}
 );
 
-// @route   POST api/posts/comment/best/:id:comment_id
+// @route   PUT api/posts/comment/best/:id:comment_id
 // @desc    Sign as the best comment
 // @access  Private
-router.post('/comment/best/:id/:comment_id', passport.authenticate('jwt', { session: false }), (req, res) => {
+router.put(
+	'/comment/best/:id/:comment_id',
+	passport.authenticate('jwt', { session: false }),
+	async (req, res) => {
+		try {
+			const post = await Post.findById(req.params.id)
+				.populate('user', ['id', 'username', 'name', 'avatar'])
+				.populate('comments.user', ['id', 'username', 'name', 'avatar']);
 
-  Post
-    .findById(req.params.id)
-    .populate('user', ['id','username', 'name', 'avatar'])
-    .populate('comments.user', ['id','username', 'name', 'avatar'])
-    .then(post => {
-      if( !post.comments.some(comment => comment._id.toString() === req.params.comment_id )) {
-        return res.status(404).json({ commentnotexists: 'Comment does not exist' });
-      };
+			if (
+				!post.comments.some(
+					comment => comment._id.toString() === req.params.comment_id
+				)
+			) {
+				return res.status(404).json({
+					error: true,
+					message: 'Comment with that ID does not exist',
+				});
+			}
 
-      if(req.user.id !== post.user._id.toString()) {
-         return res.status(401).json({ notauthorized: "User not authorized" });
-      };
+			if (req.user.id !== post.user._id.toString()) {
+				return res.status(401).json({
+					error: true,
+					message:
+						'User not authorized. Only post author can sign comment as the best',
+				});
+			}
 
-      post.comments.forEach( comment => {
-        if(comment._id.toString() === req.params.comment_id) {
-          comment.best = !comment.best
-        } else {
-          comment.best = false
-        }
-      })
+			post.comments.forEach(comment => {
+				if (comment._id.toString() === req.params.comment_id) {
+					comment.best = !comment.best;
+				} else {
+					comment.best = false;
+				}
+			});
 
-      post
-        .save()
-        .then(post => res.json(post))
-        .catch(err => res.json(err));
-    })
-    .catch(err => res.status(404).json({ postnotfound: 'No post found' }));
-  }
+			await post.save();
+			res.json(post);
+		} catch (err) {
+			if (err.kind === 'ObjectId') {
+				return res.status(404).json({
+					error: true,
+					message: 'Post with that ID does not exist',
+				});
+			}
+			res.status(400).json(err);
+		}
+	}
 );
-
 
 module.exports = router;
