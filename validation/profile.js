@@ -7,7 +7,7 @@ const validateProfileInput = data => {
   data.status = !isEmpty(data.status) ? data.status : '';
   data.skills = !isEmpty(data.skills) ? data.skills : '';
 
-  if (Validator.isEmpty(data.status)) {
+  if (Validator.isEmpty(data.status) || data.status === '0') {
     errors.status = 'Status field is required';
   }
 
