@@ -83,7 +83,7 @@ router.post('/register', async (req, res) => {
 
     const secret = keys.secretOrKey + user.id + user.date.getTime();
 
-    const token = jwtS.encode({ id: user.id }, secret);
+    const token = jwt.sign({ id: user.id }, secret);
 
     const emailData = {
       subject: 'Email Verification - DevService',
@@ -105,26 +105,32 @@ router.post('/register', async (req, res) => {
 // @route   POST api/users/register/send_email_verification/:id
 // @desc    Send email verification
 // @access  Private
-route.post('/register/send_email_verification/:id', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.post('/register/send_email_verification/:id', passport.authenticate('jwt', { session: false }), async (req, res) => {
 
     try {
       const user = await User.findById(req.params.id);
+      if(!user) {
+        return res.status(404).json({ error: true, message: 'Invalid URL (User ID not found in DB)' });
+      };
 
       const secret = keys.secretOrKey + user.id + user.date.getTime();
 
-      const token = jwtS.encode({ id: user.id }, secret);
+      const token = jwt.sign({ id: user.id }, secret);
 
       const emailData = {
         subject: 'Email Verification - DevService',
         recipients: [user.email],
         from_email: 'no-reply@devservice.com',
-      }
+      };
 
       const mailer = new Mailer(emailData, verifyAccTemplate({ username: user.username, id: user.id, token }));
       await mailer.send();
 
       res.json({ success: true });
     } catch (e) {
+      if(err.kind === 'ObjectId') {
+        return res.status(404).json({ error: true, message: 'Invalid URL (User ID not found in DB)' });
+      };
       res.status(400).json(err)
     }
 })
@@ -132,35 +138,52 @@ route.post('/register/send_email_verification/:id', passport.authenticate('jwt',
 // @route   GET api/users/register/verify_email/:id/:token
 // @desc    Check if token and id in url is valid
 // @access  Public
-router.get('/register/verify_email/:id/:token', (req, res) => {
+router.get('/register/verify_email/:id/:token', async (req, res) => {
 
-  User
-    .findById(req.params.id)
-    .then(user => {
-      if(!user) {
-        res.status(404).json({ error: true, message: 'Invalid URL (User ID not found in DB)' });
-      }
+  try {
+    const user = await User.findById(req.params.id);
 
-      const token = req.params.token;
-      const secret = keys.secretOrKey + user.id + user.date.getTime();
+    if(!user) {
+      return res.status(404).json({ error: true, message: 'Invalid URL (User ID not found in DB)' });
+    }
 
-      try {
-        const payload = jwtS.decode(token, secret);
+    if (user.isVerified) {
+      return res.status(400).json({ error: true, message: 'Email has been verified already' });
+    }
 
-        user.isVerified = true;
-        user.save();
+    const token = req.params.token;
+    const secret = keys.secretOrKey + user.id + user.date.getTime();
+    const payload = jwt.verify(token, secret);
 
-        res.json({ success: true })
+    user.isVerified = true;
+    const { id, name, username, avatar, isVerified } = await user.save();
 
-      } catch (e) {
-         res.status(400).json({ error: true, message: 'Invalid token' })
-      };
+    const loginToken = jwt.sign(
+      {
+        id,
+        name,
+        username,
+        avatar,
+        isVerified,
+      },
+      keys.secretOrKey,
+      { expiresIn: 30 * 24 * 60 * 60 * 1000 }
+    );
 
-    })
-    .catch(err => {
-      if(err.kind === 'ObjectId') return res.status(404).json({ error: true, message: 'Invalid URL (User ID not found in DB)' });
-      res.status(400).json(err)
-    })
+    res.json({
+      success: true,
+      token: 'Bearer ' + loginToken,
+    });
+
+  } catch (err) {
+    if(err.kind === 'ObjectId') {
+      return res.status(404).json({ error: true, message: 'Invalid URL (User ID not found in DB)' });
+    }
+    if(err.name === 'JsonWebTokenError') {
+      return res.status(400).json({ error: true, message: 'Invalid URL (Token not verified)'});
+    }
+    res.status(400).json(err)
+  }
 
 });
 
