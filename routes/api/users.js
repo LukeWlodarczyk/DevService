@@ -134,7 +134,7 @@ router.post(
 			await mailer.send();
 
 			res.json({ success: true });
-		} catch (e) {
+		} catch (err) {
 			if (err.kind === 'ObjectId') {
 				return res.status(404).json({
 					error: true,
@@ -219,10 +219,15 @@ router.post('/login', async (req, res) => {
 	const password = req.body.password;
 
 	try {
-		const email = await User.findOne({ email: email_or_username });
-		const username = await User.findOne({ username: email_or_username });
+		const emailPromise = User.findOne({ email: email_or_username });
+		const usernamePromise = User.findOne({ username: email_or_username });
 
-		const user = username || email;
+		const [email, username] = await Promise.all([
+			emailPromise,
+			usernamePromise,
+		]);
+
+		const user = email || username;
 
 		if (!user) {
 			errors.email_or_username = 'User not found';

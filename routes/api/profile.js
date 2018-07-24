@@ -197,7 +197,7 @@ router.post(
 				{ user: req.user.id },
 				{
 					$push: {
-						experience: newExp,
+						experience: { $each: [newExp], $position: 0 },
 					},
 				},
 				{ new: true }
@@ -237,7 +237,7 @@ router.post(
 				{ user: req.user.id },
 				{
 					$push: {
-						education: newEdu,
+						education: { $each: [newEdu], $position: 0 },
 					},
 				},
 				{ new: true }
@@ -302,7 +302,7 @@ router.delete(
 			await User.findOneAndRemove({ _id: req.user.id });
 
 			res.json({ succes: true });
-		} catch (e) {
+		} catch (err) {
 			res.status(400).json(err);
 		}
 	}

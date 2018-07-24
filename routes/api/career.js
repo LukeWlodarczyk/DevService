@@ -161,7 +161,9 @@ router.put(
 			]);
 
 			if (!offer) {
-				res.status(404).json({ error: true, message: '' });
+				res
+					.status(404)
+					.json({ error: true, message: 'Offer with that ID does not exist' });
 			}
 
 			if (req.user.id !== offer.user._id.toString()) {
@@ -178,7 +180,7 @@ router.put(
 			);
 
 			res.json(updatedOffer);
-		} catch (e) {
+		} catch (err) {
 			if (err.kind === 'ObjectId') {
 				return res
 					.status(404)
@@ -265,7 +267,6 @@ router.post(
 
 			res.send({ success: true });
 		} catch (err) {
-			console.log(err);
 			return res.status(400).json(err);
 		}
 	}
