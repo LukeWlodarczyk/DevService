@@ -61,15 +61,14 @@ export const sendLinkToResetPassword = ({ email }, history) => dispatch => {
     );
 }
 
-export const sendEmailVerifcaion = ({ id }, history) => dispatch => {
-  dispatch(clearErrors);
+export const sendEmailVerification = ({ id }, history) => dispatch => {
   axios
-    .post(`register/send_email_verification/${id}`)
+    .post(`/api/users/register/send_email_verification/${id}`)
     .then(() => {
       history.push({
              pathname:"/success",
              state:{
-                 message: `Check out your email in order to complete verifing email.`
+                 message: `Email verification send. Check out your email in order to complete verifing. If you don't see email, check your SPAM section.`
               },
             });
     })
@@ -110,6 +109,17 @@ export const resetPassword = ({ id, token, password, password2 }, history) => di
 export const checkEmailVerUrl = ({ id, token }) => dispatch => {
   axios
     .get(`/api/users/register/verify_email/${id}/${token}`)
+    .then(res => {
+      const { token } = res.data;
+
+      localStorage.setItem('jwtToken', token);
+
+      setAuthToken(token);
+
+      const decoded = jwt_decode(token);
+
+      dispatch(setCurrentUser(decoded));
+    })
     .catch(err => {
       dispatch({
         type: GET_ERRORS,
