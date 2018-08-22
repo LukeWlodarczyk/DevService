@@ -37,3 +37,16 @@ img {
 .form-control::placeholder {
   color: #bbb !important;
 }
+
+body {
+  min-height: 100vh;
+  position: relative;
+  margin: 0;
+  padding-bottom: 120px;
+}
+
+footer {
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+}
