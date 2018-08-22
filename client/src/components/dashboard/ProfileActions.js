@@ -16,7 +16,7 @@ const ProfileActions = ({ isVerified }) => (
       </Link>
       <Link to={isVerified ? "/add-job" : "/dashboard"} className={isVerified ? "btn d-sm-inline btn-light" : "btn d-sm-inline btn-light text-muted"}>
         <i className="fas fa-briefcase text-info mr-1" />
-        Add job offer
+        Add job offer {!isVerified && '(Inactive! Verify your email!)'}
       </Link>
     </div>
 );

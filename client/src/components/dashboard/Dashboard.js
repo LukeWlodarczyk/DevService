@@ -41,7 +41,7 @@ class Dashboard extends Component {
                 <span>
                   <small className='d-block text-warning'>Please, verify your email in order to have access to all DevService feature.
                   </small>
-                  <button type='button' className='btn btn-primary btn-sm' onClick={this.handleSendEmailVerification}>Send email again</button>
+                  <button type='button' className='btn btn-primary btn-sm' onClick={this.handleSendEmailVerification}>Send verification email again</button>
                 </span>)}
             </p>
             <ProfileActions isVerified={user.isVerified} />
