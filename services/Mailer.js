@@ -10,11 +10,11 @@ class Mailer extends helper.Mail {
 		this.from_email = new helper.Email(from_email);
 		this.subject = subject;
 		this.body = new helper.Content('text/html', content);
-    this.recipients = this.formatAddresses(recipients);
-		attachment && (this.attachment = this.prepareAttachment(attachment))
+		this.recipients = this.formatAddresses(recipients);
+		attachment && (this.attachment = this.prepareAttachment(attachment));
 
 		this.addContent(this.body);
-    this.addRecipients();
+		this.addRecipients();
 		attachment && this.addAttachment(this.attachment);
 	}
 
@@ -22,24 +22,23 @@ class Mailer extends helper.Mail {
 		const attachment = new helper.Attachment();
 		attachment.setContent(base64File);
 		attachment.setType('application/pdf');
-		attachment.setFilename(`${fileName}.pdf`);
+		attachment.setFilename(fileName);
 		attachment.setDisposition('attachment');
 		return attachment;
 	}
 
-  formatAddresses(recipients) {
-		return recipients.map((email) => new helper.Email(email));
+	formatAddresses(recipients) {
+		return recipients.map(email => new helper.Email(email));
 	}
 
-  addRecipients() {
-    const personalize = new helper.Personalization();
+	addRecipients() {
+		const personalize = new helper.Personalization();
 
-    this.recipients.forEach(recipient => {
-      personalize.addTo(recipient);
-    });
-    this.addPersonalization(personalize);
-  }
-
+		this.recipients.forEach(recipient => {
+			personalize.addTo(recipient);
+		});
+		this.addPersonalization(personalize);
+	}
 
 	async send() {
 		const request = this.sgApi.emptyRequest({
