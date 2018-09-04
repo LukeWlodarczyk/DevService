@@ -28,26 +28,16 @@ class OfferForm extends Component {
     e.preventDefault();
 
     const { message, subject, email, attachment } = this.state;
+    const { sendApplication, id, history } = this.props;
 
-    this.props.sendApplication({ message, subject, email, attachment, offerId: this.props.id }, this.props.history);
+    sendApplication({ message, subject, email, attachment, offerId: id }, history);
 
   }
 
   handleUploadFile = event => {
-    let selectedFile = event.target.files;
-    let file = null;
-    let fileName = "";
+    const selectedFile = event.target.files;
 
     if (selectedFile.length > 0) {
-
-        if(!selectedFile[0].type.includes('pdf')) {
-          this.setState({
-            errors: {
-              ...this.state.errors,
-              file: 'Invalid image file type!'
-            }
-          })
-        }
 
         if(selectedFile[0].size > 1536) {
           this.setState({
@@ -58,18 +48,18 @@ class OfferForm extends Component {
           })
         }
 
-        let fileToLoad = selectedFile[0];
-        fileName = fileToLoad.name;
+        const fileToLoad = selectedFile[0];
+        const { type, name: fileName } = fileToLoad;
 
-        let fileReader = new FileReader();
+        const fileReader = new FileReader();
 
         fileReader.onload = fileLoadedEvent => {
-            file = fileLoadedEvent.target.result;
+            const file = fileLoadedEvent.target.result;
 
             const base64File = new Buffer(file).toString('base64');
 
             this.setState({
-              attachment: { base64File, fileName },
+              attachment: { base64File, fileName, type },
             })
         };
 
