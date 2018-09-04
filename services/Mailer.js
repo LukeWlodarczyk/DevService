@@ -18,10 +18,10 @@ class Mailer extends helper.Mail {
 		attachment && this.addAttachment(this.attachment);
 	}
 
-	prepareAttachment({ base64File, fileName }) {
+	prepareAttachment({ base64File, fileName, type }) {
 		const attachment = new helper.Attachment();
 		attachment.setContent(base64File);
-		attachment.setType('application/pdf');
+		attachment.setType(type);
 		attachment.setFilename(fileName);
 		attachment.setDisposition('attachment');
 		return attachment;

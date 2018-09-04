@@ -178,9 +178,11 @@ exports.applyForAJob = async (req, res) => {
 	};
 
 	if (req.body.attachment) {
+		const { base64File, fileName, type } = req.body.attachment;
 		emailData.attachment = {
-			base64File: req.body.attachment.base64File,
-			fileName: req.body.attachment.fileName,
+			base64File,
+			fileName,
+			type,
 		};
 	}
 
